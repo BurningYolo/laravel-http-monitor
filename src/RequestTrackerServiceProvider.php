@@ -7,7 +7,7 @@ use Burningyolo\LaravelHttpMonitor\Middleware\TrackInboundRequest;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Config;  
 
-class RequestTrackerSeviceProvider extends ServiceProvider 
+class RequestTrackerServiceProvider extends ServiceProvider
 {
     public function boot()
     {
