@@ -1,11 +1,13 @@
-<?php 
+<?php
 
 namespace Burningyolo\LaravelHttpMonitor;
 
-use Illuminate\Support\ServiceProvider; 
-use Burningyolo\LaravelHttpMonitor\Middleware\TrackInboundRequest; 
+use Illuminate\Support\ServiceProvider;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\Config;  
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
+use Burningyolo\LaravelHttpMonitor\Middleware\TrackInboundRequest;
+use Burningyolo\LaravelHttpMonitor\Http\OutboundRequestMiddleware;
 
 class RequestTrackerServiceProvider extends ServiceProvider
 {
@@ -13,18 +15,18 @@ class RequestTrackerServiceProvider extends ServiceProvider
     {
         // Publish migrations
         $this->publishes([
-            __DIR__.'/../database/migrations' => \database_path('migrations'),
+            __DIR__ . '/../database/migrations' => database_path('migrations'),
         ], 'request-tracker-migrations');
 
         // Publish config
         $this->publishes([
-            __DIR__.'/../config/request-tracker.php' => \config_path('request-tracker.php'),
+            __DIR__ . '/../config/request-tracker.php' => config_path('request-tracker.php'),
         ], 'request-tracker-config');
 
-        // Load migrations automatically
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        // Auto-load migrations
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
-        // Register middleware
+        // Register inbound middleware
         $router = $this->app->make(Router::class);
         $router->pushMiddlewareToGroup('web', TrackInboundRequest::class);
         $router->pushMiddlewareToGroup('api', TrackInboundRequest::class);
@@ -32,37 +34,37 @@ class RequestTrackerServiceProvider extends ServiceProvider
 
     public function register()
     {
-        // Merge config
         $this->mergeConfigFrom(
-            __DIR__.'/../config/request-tracker.php', 'request-tracker'
+            __DIR__ . '/../config/request-tracker.php',
+            'request-tracker'
         );
 
-        // Automatically track all outbound HTTP requests
+        // Delay until Laravel is fully booted (Laravel 9–11 safe)
         $this->app->booted(function () {
             if (Config::get('request-tracker.track_outbound', true)) {
-                $this->registerGlobalHttpTracking();
+                $this->registerOutboundTracking();
             }
         });
     }
 
-    protected function registerGlobalHttpTracking()
+    protected function registerOutboundTracking(): void
     {
-        // Register global middleware for all HTTP requests
-        \Illuminate\Support\Facades\Http::globalRequestMiddleware(
-            \Burningyolo\LaravelHttpMonitor\Http\OutboundRequestMiddleware::middleware()
+        
+        Http::globalMiddleware(
+            OutboundRequestMiddleware::handle()
         );
 
-        // Also register the macro for explicit tracking if needed
-        \Illuminate\Support\Facades\Http::macro('tracked', function () {
-            return \Illuminate\Support\Facades\Http::withMiddleware(
-                \Burningyolo\LaravelHttpMonitor\Http\OutboundRequestMiddleware::middleware()
+        // Explicit opt-in
+        Http::macro('tracked', function () {
+            return Http::withMiddleware(
+                OutboundRequestMiddleware::handle()
             );
         });
 
-        // Register macro to skip tracking for specific requests
-        \Illuminate\Support\Facades\Http::macro('untracked', function () {
-            return \Illuminate\Support\Facades\Http::withoutMiddleware(
-                \Burningyolo\LaravelHttpMonitor\Http\OutboundRequestMiddleware::class
+        // Explicit opt-out
+        Http::macro('untracked', function () {
+            return Http::withoutMiddleware(
+                OutboundRequestMiddleware::handle()
             );
         });
     }
