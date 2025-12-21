@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Burningyolo\LaravelHttpMonitor\Models\InboundRequest;
 use Burningyolo\LaravelHttpMonitor\Models\TrackedIp;
+use Burningyolo\LaravelHttpMonitor\Jobs\FetchIpGeoDataJob;
 
 class TrackInboundRequest
 {
@@ -56,6 +57,9 @@ class TrackInboundRequest
 
         if ($ip = $request->ip()) {
             $trackedIp = TrackedIp::getOrCreateFromIp($ip);
+            
+            // Dispatch geo data fetch job if enabled and needed
+            $this->dispatchGeoDataFetch($trackedIp, $ip);
         }
 
         $route = Route::current();
@@ -97,5 +101,59 @@ class TrackInboundRequest
             'route_name'       => $route?->getName(),
             'controller_action'=> $route?->getActionName(),
         ]);
+    }
+
+    /**
+     * Dispatch geo data fetch job if needed
+     */
+    protected function dispatchGeoDataFetch(TrackedIp $trackedIp, string $ip): void
+    {
+        // Check if geo fetching is enabled
+        if (!Config::get('request-tracker.fetch_geo_data', true)) {
+            return;
+        }
+
+        // Skip if already has geo data
+        if ($trackedIp->hasGeoData()) {
+            return;
+        }
+
+        // Skip certain IPs (localhost, private IPs, etc.)
+        if ($this->shouldSkipGeoFetch($ip)) {
+            return;
+        }
+
+        // Dispatch job or fetch synchronously based on config
+        if (Config::get('request-tracker.geo_dispatch_async', true)) {
+            FetchIpGeoDataJob::dispatch($trackedIp->id);
+        } else {
+            try {
+                (new FetchIpGeoDataJob($trackedIp->id))->handle();
+            } catch (\Throwable $e) {
+                Log::warning('Failed to fetch geo data synchronously', [
+                    'ip' => $ip,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Check if IP should be skipped for geo fetching
+     */
+    protected function shouldSkipGeoFetch(string $ip): bool
+    {
+        // Check configured skip list
+        $skipList = Config::get('request-tracker.skip_geo_for_ips', []);
+        if (in_array($ip, $skipList)) {
+            return true;
+        }
+
+        // Skip private/reserved IP ranges (10.x.x.x, 172.16-31.x.x, 192.168.x.x, 127.x.x.x, etc.)
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+            return true;
+        }
+
+        return false;
     }
 }

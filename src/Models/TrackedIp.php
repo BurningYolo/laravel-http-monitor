@@ -5,6 +5,7 @@ namespace Burningyolo\LaravelHttpMonitor\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+
 class TrackedIp extends Model
 {
     protected $fillable = [
@@ -55,4 +56,16 @@ class TrackedIp extends Model
 
         return $trackedIp;
     }
+
+    /**
+     * Check if this IP has geo data
+     */
+    public function hasGeoData(): bool
+    {
+        return !is_null($this->country_code) || 
+               !is_null($this->city) || 
+               !is_null($this->latitude);
+    }
+
+
 }
