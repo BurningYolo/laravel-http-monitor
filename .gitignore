@@ -1,0 +1,50 @@
+# Composer
+/vendor/
+composer.lock
+
+# IDE & Editors
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.phpstorm.meta.php
+_ide_helper.php
+_ide_helper_models.php
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+
+# Testing
+.phpunit.result.cache
+phpunit.xml
+coverage/
+.phpunit.cache/
+
+# Build & Cache
+build/
+dist/
+*.cache
+
+# Environment
+.env
+.env.backup
+.env.production
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo

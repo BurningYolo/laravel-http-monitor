@@ -1,0 +1,32 @@
+{
+  "name": "burningyolo/laravel-http-monitor",
+  "description": "Track inbound and outbound HTTP requests with IP geolocation data",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Burningyolo\\LaravelHttpMonitor\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "BurningYolo",
+      "email": "hishamzahid123@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "^8.1",
+    "illuminate/support": "^10.0|^11.0",
+    "illuminate/http": "^10.0|^11.0",
+    "illuminate/database": "^10.0|^11.0"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Burningyolo\\LaravelHttpMonitor\\RequestTrackerServiceProvider"
+      ]
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
