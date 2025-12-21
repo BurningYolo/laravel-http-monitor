@@ -10,6 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Http\Client\Response;
 use Burningyolo\LaravelHttpMonitor\Models\TrackedIp;
 
 class FetchIpGeoDataJob implements ShouldQueue
@@ -99,6 +100,7 @@ class FetchIpGeoDataJob implements ShouldQueue
 
     protected function fetchFromIpApi(string $ip, int $timeout): ?array
     {
+        /** @var Response $response */
         $response = Http::timeout($timeout)
             ->retry(2, 100)
             ->get("http://ip-api.com/json/{$ip}", [
@@ -148,6 +150,7 @@ class FetchIpGeoDataJob implements ShouldQueue
             return null;
         }
 
+        /** @var Response $response */
         $response = Http::timeout($timeout)
             ->retry(2, 100)
             ->get("https://ipinfo.io/{$ip}", [
@@ -197,6 +200,7 @@ class FetchIpGeoDataJob implements ShouldQueue
             ? "https://ipapi.co/{$ip}/json/?key={$apiKey}"
             : "https://ipapi.co/{$ip}/json/";
 
+        /** @var Response $response */
         $response = Http::timeout($timeout)
             ->retry(2, 100)
             ->get($url);
