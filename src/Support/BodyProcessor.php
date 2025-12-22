@@ -4,26 +4,24 @@ namespace Burningyolo\LaravelHttpMonitor\Support;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Str;
 
 class BodyProcessor
 {
     public static function process(?string $body, ?Request $request = null): ?string
     {
-         if(!is_string($body))
-            {
-                return null ; 
-            }  
+        if (! is_string($body)) {
+            return null;
+        }
 
         $maxSize = Config::get('request-tracker.max_body_size', 65536);
 
-        $data = self::extractData($body , $request);
+        $data = self::extractData($body, $request);
 
         if (is_array($data)) {
             return self::processArrayData($data, $maxSize, $body ?? '');
         }
 
-         // Not JSON or failed to decode, just return as-is (pehaly se size checked)
+        // Not JSON or failed to decode, just return as-is (pehaly se size checked)
         if (strlen($body) > $maxSize) {
             return substr($body, 0, $maxSize).'... [truncated]';
         }
@@ -31,36 +29,36 @@ class BodyProcessor
         return $body;
     }
 
-protected static function extractData(string $body, ?Request $request = null): ?array
-{
-    if ($request instanceof Request) {
-        if ($request->isJson()) {
-            $json = $request->json()->all();
-            if (! empty($json)) {
-                return $json;
+    protected static function extractData(string $body, ?Request $request = null): ?array
+    {
+        if ($request instanceof Request) {
+            if ($request->isJson()) {
+                $json = $request->json()->all();
+                if (! empty($json)) {
+                    return $json;
+                }
+            }
+
+            $input = $request->all();
+            if (! empty($input)) {
+                return $input;
             }
         }
 
-        $input = $request->all();
-        if (! empty($input)) {
-            return $input;
+        if (! empty($body) || $body === '0') {
+            $decoded = json_decode($body, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
         }
-    }
 
-    if (! empty($body) || $body === '0') {
-        $decoded = json_decode($body, true);
-        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-            return $decoded;
-        }
+        return null;
     }
-
-    return null;
-}
 
     /**
      * Process array data by omitting sensitive fields  (functions probably nhi chahiye but it aight)
      */
-protected static function processArrayData(array $data, int $maxSize, string $originalBody): string
+    protected static function processArrayData(array $data, int $maxSize, string $originalBody): string
     {
         $omittedFields = Config::get('request-tracker.omit_body_fields', []);
 
@@ -72,6 +70,7 @@ protected static function processArrayData(array $data, int $maxSize, string $or
             if (strlen($originalBody) > $maxSize) {
                 return substr($originalBody, 0, $maxSize).'... [truncated]';
             }
+
             return $originalBody;
         }
 
@@ -83,8 +82,7 @@ protected static function processArrayData(array $data, int $maxSize, string $or
         return $encoded;
     }
 
-
- protected static function omitSensitiveFields(array $data, array $fieldsToOmit): array
+    protected static function omitSensitiveFields(array $data, array $fieldsToOmit): array
     {
         $result = [];
 
@@ -96,6 +94,7 @@ protected static function processArrayData(array $data, int $maxSize, string $or
                 } else {
                     $result[$key] = $value;
                 }
+
                 continue;
             }
 
@@ -128,7 +127,6 @@ protected static function processArrayData(array $data, int $maxSize, string $or
 
         return false;
     }
-
 
     // tests mein use kring ye fucntions , probably better way to do this but for now it aight
     public static function getOmittedFields(): array
