@@ -72,7 +72,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Hosts that should not be tracked for outbound requests.
-    | 
+    |
     |
     */
     'excluded_outbound_hosts' => [
@@ -127,11 +127,11 @@ return [
     |--------------------------------------------------------------------------
     |
     | The geo IP provider to use for fetching location data.
-    | 
+    |
     | Available providers:
     | - 'ip-api' (defualt)
-    | - 'ipinfo' 
-    | - 'ipapi' 
+    | - 'ipinfo'
+    | - 'ipapi'
     |
     */
     'geo_provider' => env('REQUEST_TRACKER_GEO_PROVIDER', 'ip-api'),
@@ -153,7 +153,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | API key for ipapi.co provider.
-    | 
+    |
     |
     */
     'ipapi_key' => env('IPAPI_KEY'),

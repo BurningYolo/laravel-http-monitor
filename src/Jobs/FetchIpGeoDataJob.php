@@ -2,23 +2,25 @@
 
 namespace Burningyolo\LaravelHttpMonitor\Jobs;
 
+use Burningyolo\LaravelHttpMonitor\Models\TrackedIp;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Http\Client\Response;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Http\Client\Response;
-use Burningyolo\LaravelHttpMonitor\Models\TrackedIp;
 
 class FetchIpGeoDataJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 3;
+
     public $backoff = [60, 300, 900]; // 1min, 5min, 15min
+
     public $timeout = 30;
 
     protected int $trackedIpId;
@@ -26,7 +28,7 @@ class FetchIpGeoDataJob implements ShouldQueue
     public function __construct(int $trackedIpId)
     {
         $this->trackedIpId = $trackedIpId;
-        
+
         // Use custom queue if configured
         $queue = Config::get('request-tracker.geo_queue', 'default');
         $this->onQueue($queue);
@@ -35,13 +37,13 @@ class FetchIpGeoDataJob implements ShouldQueue
     public function handle(): void
     {
         // Check if geo lookup is enabled
-        if (!Config::get('request-tracker.fetch_geo_data', true)) {
+        if (! Config::get('request-tracker.fetch_geo_data', true)) {
             return;
         }
 
         $trackedIp = TrackedIp::find($this->trackedIpId);
 
-        if (!$trackedIp || $trackedIp->hasGeoData()) {
+        if (! $trackedIp || $trackedIp->hasGeoData()) {
             return;
         }
 
@@ -81,7 +83,7 @@ class FetchIpGeoDataJob implements ShouldQueue
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            
+
             throw $e;
         }
     }
@@ -90,7 +92,7 @@ class FetchIpGeoDataJob implements ShouldQueue
     {
         $timeout = Config::get('request-tracker.geo_timeout', 5);
 
-        return match($provider) {
+        return match ($provider) {
             'ip-api' => $this->fetchFromIpApi($ip, $timeout),
             'ipinfo' => $this->fetchFromIpInfo($ip, $timeout),
             'ipapi' => $this->fetchFromIpApi2($ip, $timeout),
@@ -104,25 +106,27 @@ class FetchIpGeoDataJob implements ShouldQueue
         $response = Http::timeout($timeout)
             ->retry(2, 100)
             ->get("http://ip-api.com/json/{$ip}", [
-                'fields' => 'status,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as'
+                'fields' => 'status,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as',
             ]);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             Log::warning('ip-api.com request failed', [
                 'status' => $response->status(),
                 'ip' => $ip,
             ]);
+
             return null;
         }
 
         $data = $response->json();
-        
+
         if (($data['status'] ?? '') !== 'success') {
             Log::warning('ip-api.com returned non-success status', [
                 'status' => $data['status'] ?? 'unknown',
                 'message' => $data['message'] ?? 'No message',
                 'ip' => $ip,
             ]);
+
             return null;
         }
 
@@ -144,9 +148,10 @@ class FetchIpGeoDataJob implements ShouldQueue
     protected function fetchFromIpInfo(string $ip, int $timeout): ?array
     {
         $token = Config::get('request-tracker.ipinfo_token');
-        
-        if (!$token) {
+
+        if (! $token) {
             Log::warning('ipinfo.io token not configured');
+
             return null;
         }
 
@@ -154,14 +159,15 @@ class FetchIpGeoDataJob implements ShouldQueue
         $response = Http::timeout($timeout)
             ->retry(2, 100)
             ->get("https://ipinfo.io/{$ip}", [
-                'token' => $token
+                'token' => $token,
             ]);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             Log::warning('ipinfo.io request failed', [
                 'status' => $response->status(),
                 'ip' => $ip,
             ]);
+
             return null;
         }
 
@@ -173,11 +179,12 @@ class FetchIpGeoDataJob implements ShouldQueue
                 'error' => $data['error'],
                 'ip' => $ip,
             ]);
+
             return null;
         }
 
         [$lat, $lon] = isset($data['loc']) ? explode(',', $data['loc']) : [null, null];
-        
+
         return [
             'country' => $data['country'] ?? null,
             'country_code' => $data['country'] ?? null,
@@ -196,7 +203,7 @@ class FetchIpGeoDataJob implements ShouldQueue
     protected function fetchFromIpApi2(string $ip, int $timeout): ?array
     {
         $apiKey = Config::get('request-tracker.ipapi_key');
-        $url = $apiKey 
+        $url = $apiKey
             ? "https://ipapi.co/{$ip}/json/?key={$apiKey}"
             : "https://ipapi.co/{$ip}/json/";
 
@@ -205,11 +212,12 @@ class FetchIpGeoDataJob implements ShouldQueue
             ->retry(2, 100)
             ->get($url);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             Log::warning('ipapi.co request failed', [
                 'status' => $response->status(),
                 'ip' => $ip,
             ]);
+
             return null;
         }
 
@@ -222,9 +230,10 @@ class FetchIpGeoDataJob implements ShouldQueue
                 'reason' => $data['reason'] ?? 'Unknown',
                 'ip' => $ip,
             ]);
+
             return null;
         }
-        
+
         return [
             'country' => $data['country_name'] ?? null,
             'country_code' => $data['country_code'] ?? null,

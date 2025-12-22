@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('tracked_ips', function (Blueprint $table) {
             $table->id();
             $table->string('ip_address', 45)->unique();
-            
+
             // Geo data columns
             $table->string('country_code', 2)->nullable();
             $table->string('country_name')->nullable();
@@ -24,14 +24,14 @@ return new class extends Migration
             $table->string('timezone')->nullable();
             $table->string('isp')->nullable();
             $table->string('organization')->nullable();
-            
+
             // Metadata
             $table->timestamp('first_seen_at')->nullable();
             $table->timestamp('last_seen_at')->nullable();
             $table->unsignedInteger('request_count')->default(0);
-            
+
             $table->timestamps();
-            
+
             $table->index('ip_address');
             $table->index('country_code');
             $table->index('last_seen_at');

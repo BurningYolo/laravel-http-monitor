@@ -2,12 +2,12 @@
 
 namespace Burningyolo\LaravelHttpMonitor;
 
-use Illuminate\Support\ServiceProvider;
+use Burningyolo\LaravelHttpMonitor\Http\OutboundRequestMiddleware;
+use Burningyolo\LaravelHttpMonitor\Middleware\TrackInboundRequest;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
-use Burningyolo\LaravelHttpMonitor\Middleware\TrackInboundRequest;
-use Burningyolo\LaravelHttpMonitor\Http\OutboundRequestMiddleware;
+use Illuminate\Support\ServiceProvider;
 
 class RequestTrackerServiceProvider extends ServiceProvider
 {
@@ -15,16 +15,16 @@ class RequestTrackerServiceProvider extends ServiceProvider
     {
         // Publish migrations
         $this->publishes([
-            __DIR__ . '/../database/migrations' => database_path('migrations'),
+            __DIR__.'/../database/migrations' => database_path('migrations'),
         ], 'request-tracker-migrations');
 
         // Publish config
         $this->publishes([
-            __DIR__ . '/../config/request-tracker.php' => config_path('request-tracker.php'),
+            __DIR__.'/../config/request-tracker.php' => config_path('request-tracker.php'),
         ], 'request-tracker-config');
 
         // Auto-load migrations
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
         // Register inbound middleware
         $router = $this->app->make(Router::class);
@@ -35,7 +35,7 @@ class RequestTrackerServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/request-tracker.php',
+            __DIR__.'/../config/request-tracker.php',
             'request-tracker'
         );
 
@@ -49,7 +49,7 @@ class RequestTrackerServiceProvider extends ServiceProvider
 
     protected function registerOutboundTracking(): void
     {
-        
+
         Http::globalMiddleware(
             OutboundRequestMiddleware::handle()
         );

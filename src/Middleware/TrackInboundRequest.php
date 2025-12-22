@@ -2,27 +2,27 @@
 
 namespace Burningyolo\LaravelHttpMonitor\Middleware;
 
-use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
-use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Burningyolo\LaravelHttpMonitor\Jobs\FetchIpGeoDataJob;
 use Burningyolo\LaravelHttpMonitor\Models\InboundRequest;
 use Burningyolo\LaravelHttpMonitor\Models\TrackedIp;
-use Burningyolo\LaravelHttpMonitor\Jobs\FetchIpGeoDataJob;
+use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TrackInboundRequest
 {
     public function handle(Request $request, Closure $next)
     {
         if (
-            !Config::get('request-tracker.enabled', true) ||
-            !Config::get('request-tracker.track_inbound', true)
+            ! Config::get('request-tracker.enabled', true) ||
+            ! Config::get('request-tracker.track_inbound', true)
         ) {
             return $next($request);
         }
@@ -44,7 +44,7 @@ class TrackInboundRequest
         } catch (\Throwable $e) {
             Log::warning('Failed to track inbound request', [
                 'error' => $e->getMessage(),
-                'url'   => $request->fullUrl(),
+                'url' => $request->fullUrl(),
             ]);
         }
 
@@ -57,7 +57,7 @@ class TrackInboundRequest
 
         if ($ip = $request->ip()) {
             $trackedIp = TrackedIp::getOrCreateFromIp($ip);
-            
+
             // Dispatch geo data fetch job if enabled and needed
             $this->dispatchGeoDataFetch($trackedIp, $ip);
         }
@@ -69,37 +69,37 @@ class TrackInboundRequest
             $response instanceof BinaryFileResponse;
 
         InboundRequest::create([
-            'tracked_ip_id'    => $trackedIp?->id,
-            'method'           => $request->method(),
-            'url'              => $request->url(),
-            'full_url'         => $request->fullUrl(),
-            'path'             => $request->path(),
-            'query_string'     => $request->getQueryString(),
-            'headers'          => Config::get('request-tracker.store_headers')
+            'tracked_ip_id' => $trackedIp?->id,
+            'method' => $request->method(),
+            'url' => $request->url(),
+            'full_url' => $request->fullUrl(),
+            'path' => $request->path(),
+            'query_string' => $request->getQueryString(),
+            'headers' => Config::get('request-tracker.store_headers')
                 ? $request->headers->all()
                 : null,
-            'request_body'     => Config::get('request-tracker.store_body')
+            'request_body' => Config::get('request-tracker.store_body')
                 ? $request->getContent()
                 : null,
-            'status_code'      => method_exists($response, 'getStatusCode')
+            'status_code' => method_exists($response, 'getStatusCode')
                 ? $response->getStatusCode()
                 : null,
             'response_headers' => Config::get('request-tracker.store_headers')
                 ? $response->headers->all()
                 : null,
-            'response_body'    => (
-                Config::get('request-tracker.store_body') && !$isStreamed
+            'response_body' => (
+                Config::get('request-tracker.store_body') && ! $isStreamed
             )
                 ? $response->getContent()
                 : null,
-            'duration_ms'      => round($duration),
-            'user_id'          => Auth::id(),
-            'user_type'        => Auth::check() ? get_class(Auth::user()) : null,
-            'session_id'       => Session::getId(),
-            'user_agent'       => $request->userAgent(),
-            'referer'          => $request->header('referer'),
-            'route_name'       => $route?->getName(),
-            'controller_action'=> $route?->getActionName(),
+            'duration_ms' => round($duration),
+            'user_id' => Auth::id(),
+            'user_type' => Auth::check() ? get_class(Auth::user()) : null,
+            'session_id' => Session::getId(),
+            'user_agent' => $request->userAgent(),
+            'referer' => $request->header('referer'),
+            'route_name' => $route?->getName(),
+            'controller_action' => $route?->getActionName(),
         ]);
     }
 
@@ -109,7 +109,7 @@ class TrackInboundRequest
     protected function dispatchGeoDataFetch(TrackedIp $trackedIp, string $ip): void
     {
         // Check if geo fetching is enabled
-        if (!Config::get('request-tracker.fetch_geo_data', true)) {
+        if (! Config::get('request-tracker.fetch_geo_data', true)) {
             return;
         }
 

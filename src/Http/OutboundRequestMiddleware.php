@@ -2,14 +2,14 @@
 
 namespace Burningyolo\LaravelHttpMonitor\Http;
 
+use Burningyolo\LaravelHttpMonitor\Models\OutboundRequest;
+use Burningyolo\LaravelHttpMonitor\Models\TrackedIp;
 use Closure;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use Psr\Http\Message\RequestInterface;
-use Burningyolo\LaravelHttpMonitor\Models\OutboundRequest;
-use Burningyolo\LaravelHttpMonitor\Models\TrackedIp;
 
 class OutboundRequestMiddleware
 {
@@ -36,6 +36,7 @@ class OutboundRequestMiddleware
                     function ($response) use ($request, $startTime) {
                         $duration = (microtime(true) - $startTime) * 1000;
                         self::logRequest($request, $response, $duration);
+
                         return $response;
                     },
                     function ($reason) use ($request, $startTime) {
@@ -55,14 +56,14 @@ class OutboundRequestMiddleware
         $error = null
     ): void {
         if (
-            !Config::get('request-tracker.enabled', true) ||
-            !Config::get('request-tracker.track_outbound', true)
+            ! Config::get('request-tracker.enabled', true) ||
+            ! Config::get('request-tracker.track_outbound', true)
         ) {
             return;
         }
 
         try {
-            $uri  = $request->getUri();
+            $uri = $request->getUri();
             $host = $uri->getHost();
 
             $excludedHosts = Config::get('request-tracker.excluded_outbound_hosts', []);
@@ -82,32 +83,32 @@ class OutboundRequestMiddleware
             );
 
             OutboundRequest::create([
-                'tracked_ip_id'   => $trackedIp?->id,
-                'method'          => $request->getMethod(),
-                'url'             => (string) $uri,
-                'host'            => $host,
-                'full_url'        => (string) $uri,
-                'path'            => $uri->getPath(),
-                'query_string'    => $uri->getQuery(),
-                'headers'         => Config::get('request-tracker.store_headers')
+                'tracked_ip_id' => $trackedIp?->id,
+                'method' => $request->getMethod(),
+                'url' => (string) $uri,
+                'host' => $host,
+                'full_url' => (string) $uri,
+                'path' => $uri->getPath(),
+                'query_string' => $uri->getQuery(),
+                'headers' => Config::get('request-tracker.store_headers')
                     ? $request->getHeaders()
                     : null,
-                'request_body'    => Config::get('request-tracker.store_body')
+                'request_body' => Config::get('request-tracker.store_body')
                     ? (string) $request->getBody()
                     : null,
-                'status_code'     => $response?->getStatusCode(),
+                'status_code' => $response?->getStatusCode(),
                 'response_headers' => $response && Config::get('request-tracker.store_headers')
                     ? $response->getHeaders()
                     : null,
-                'response_body'   => $response && Config::get('request-tracker.store_body')
+                'response_body' => $response && Config::get('request-tracker.store_body')
                     ? (string) $response->getBody()
                     : null,
-                'duration_ms'     => round($duration),
-                'user_id'         => Auth::id(),
-                'user_type'       => Auth::check() ? get_class(Auth::user()) : null,
-                'triggered_by'    => $triggeredBy,
-                'successful'      => $error === null,
-                'error_message'   => $error ? (string) $error : null,
+                'duration_ms' => round($duration),
+                'user_id' => Auth::id(),
+                'user_type' => Auth::check() ? get_class(Auth::user()) : null,
+                'triggered_by' => $triggeredBy,
+                'successful' => $error === null,
+                'error_message' => $error ? (string) $error : null,
             ]);
         } catch (\Throwable $e) {
             Log::warning('Outbound request tracking failed', [
@@ -119,7 +120,7 @@ class OutboundRequestMiddleware
     protected static function getTriggeredBy(array $backtrace): ?string
     {
         foreach ($backtrace as $trace) {
-            if (!isset($trace['class'])) {
+            if (! isset($trace['class'])) {
                 continue;
             }
 

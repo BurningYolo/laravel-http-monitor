@@ -62,10 +62,8 @@ class TrackedIp extends Model
      */
     public function hasGeoData(): bool
     {
-        return !is_null($this->country_code) || 
-               !is_null($this->city) || 
-               !is_null($this->latitude);
+        return ! is_null($this->country_code) ||
+               ! is_null($this->city) ||
+               ! is_null($this->latitude);
     }
-
-
 }
