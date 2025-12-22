@@ -17,11 +17,7 @@ class FetchIpGeoDataJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $tries = 3;
 
-    public $backoff = [60, 300, 900]; // 1min, 5min, 15min
-
-    public $timeout = 30;
 
     protected int $trackedIpId;
 
@@ -249,14 +245,4 @@ class FetchIpGeoDataJob implements ShouldQueue
         ];
     }
 
-    /**
-     * Handle job failure
-     */
-    public function failed(\Throwable $exception): void
-    {
-        Log::error('FetchIpGeoDataJob failed permanently', [
-            'tracked_ip_id' => $this->trackedIpId,
-            'error' => $exception->getMessage(),
-        ]);
-    }
 }

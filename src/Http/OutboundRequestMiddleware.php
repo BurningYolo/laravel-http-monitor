@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Psr\Http\Message\RequestInterface;
+use Burningyolo\LaravelHttpMonitor\Support\BodyProcessor; 
 
 class OutboundRequestMiddleware
 {
@@ -81,6 +82,18 @@ class OutboundRequestMiddleware
             $triggeredBy = self::getTriggeredBy(
                 debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 12)
             );
+
+            $requestBody = null;
+            if (Config::get('request-tracker.store_body')) {
+                $rawBody = (string) $request->getBody();
+                $requestBody = BodyProcessor::process($rawBody);
+            }
+
+            $responseBody = null;
+            if ($response && Config::get('request-tracker.store_body')) {
+                $rawResponseBody = (string) $response->getBody();
+                $responseBody = BodyProcessor::process($rawResponseBody);
+            }
 
             OutboundRequest::create([
                 'tracked_ip_id' => $trackedIp?->id,

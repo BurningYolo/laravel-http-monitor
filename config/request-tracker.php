@@ -68,6 +68,59 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Maximum Body Size
+    |--------------------------------------------------------------------------
+    |
+    | Maximum size (in bytes) for request/response bodies to store.
+    | Bodies larger than this will be truncated with a notice.
+    |
+    | Default: 65536 (64 KB)
+    |
+    */
+    'max_body_size' => env('REQUEST_TRACKER_MAX_BODY_SIZE', 65536),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Omit Body Fields
+    |--------------------------------------------------------------------------
+    |
+    | Sensitive fields that should be omitted from request/response bodies.
+    | These fields will be replaced with '***OMITTED***' in stored data.
+    |
+    |
+    */
+    'omit_body_fields' => [
+        'password',
+        'password_confirmation',
+        'current_password',
+        'new_password',
+        'old_password',
+        'token',
+        'api_key',
+        'api_secret',
+        'secret',
+        'secret_key',
+        'access_token',
+        'refresh_token',
+        'bearer_token',
+        'auth_token',
+        'credit_card',
+        'card_number',
+        'card_cvv',
+        'cvv',
+        'cvc',
+        'ssn',
+        'social_security',
+        'pin',
+        'pin_code',
+        'private_key',
+        'encryption_key',
+        'oauth_token',
+        'oauth_secret',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Excluded Outbound Hosts
     |--------------------------------------------------------------------------
     |
@@ -129,7 +182,7 @@ return [
     | The geo IP provider to use for fetching location data.
     |
     | Available providers:
-    | - 'ip-api' (defualt)
+    | - 'ip-api' (default)
     | - 'ipinfo'
     | - 'ipapi'
     |

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Burningyolo\LaravelHttpMonitor\Support\BodyProcessor; 
 
 class TrackInboundRequest
 {
@@ -67,6 +68,20 @@ class TrackInboundRequest
         $isStreamed =
             $response instanceof StreamedResponse ||
             $response instanceof BinaryFileResponse;
+
+                // Process request body using BodyProcessor
+        $requestBody = null;
+        if (Config::get('request-tracker.store_body')) {
+            $rawBody = $request->getContent();
+            $requestBody = BodyProcessor::process($rawBody, $request);
+        }
+
+        // Process response body using BodyProcessor
+        $responseBody = null;
+        if (Config::get('request-tracker.store_body') && ! $isStreamed) {
+            $rawResponseBody = $response->getContent();
+            $responseBody = BodyProcessor::process($rawResponseBody);
+        }
 
         InboundRequest::create([
             'tracked_ip_id' => $trackedIp?->id,
