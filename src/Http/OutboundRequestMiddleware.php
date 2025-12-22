@@ -96,7 +96,7 @@ class OutboundRequestMiddleware
             }
 
             OutboundRequest::create([
-                'tracked_ip_id' => $trackedIp?->id,
+               'tracked_ip_id' => $trackedIp?->getKey(),
                 'method' => $request->getMethod(),
                 'url' => (string) $uri,
                 'host' => $host,

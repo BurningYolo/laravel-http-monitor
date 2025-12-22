@@ -37,7 +37,7 @@ class FetchIpGeoDataJob implements ShouldQueue
 
         $trackedIp = TrackedIp::find($this->trackedIpId);
 
-        if (! $trackedIp || $trackedIp->hasGeoData()) {
+        if ($trackedIp->hasGeoData()) {
             return;
         }
 

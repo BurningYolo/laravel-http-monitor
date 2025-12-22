@@ -4,8 +4,4 @@ parameters:
         - src
     excludePaths:
         - tests
-    checkMissingIterableValueType: false
-    checkGenericClassInNonGenericObjectType: false
-    ignoreErrors:
-        - '#Unsafe usage of new static#'
-        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model#'
+    treatPhpDocTypesAsCertain: false

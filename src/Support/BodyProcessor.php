@@ -18,7 +18,7 @@ class BodyProcessor
         $data = self::extractData($body, $request);
 
         if (is_array($data)) {
-            return self::processArrayData($data, $maxSize, $body ?? '');
+            return self::processArrayData($data, $maxSize, $body);
         }
 
         // Not JSON or failed to decode, just return as-is (pehaly se size checked)

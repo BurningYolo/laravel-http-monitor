@@ -97,9 +97,9 @@ class TrackInboundRequest
         if (! str_starts_with($path, '/')) {
             $path = '/'.$path;
         }
-
+        
         InboundRequest::create([
-            'tracked_ip_id' => $trackedIp?->id,
+            'tracked_ip_id' => $trackedIp?->getKey(),
             'method' => $request->method(),
             'url' => $request->url(),
             'full_url' => $request->fullUrl(),
@@ -149,10 +149,10 @@ class TrackInboundRequest
 
         // Dispatch job or fetch synchronously based on config
         if (Config::get('request-tracker.geo_dispatch_async', true)) {
-            FetchIpGeoDataJob::dispatch($trackedIp->id);
+            FetchIpGeoDataJob::dispatch($trackedIp->getKey());
         } else {
             try {
-                (new FetchIpGeoDataJob($trackedIp->id))->handle();
+                (new FetchIpGeoDataJob($trackedIp->getKey()))->handle();
             } catch (\Throwable $e) {
                 Log::warning('Failed to fetch geo data synchronously', [
                     'ip' => $ip,

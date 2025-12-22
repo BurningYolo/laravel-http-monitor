@@ -42,7 +42,8 @@
     "phpunit/phpunit": "^10.0|^11.0",
     "mockery/mockery": "^1.5",
     "laravel/pint": "^1.26",
-    "phpstan/phpstan": "^1.10"
+    "phpstan/phpstan": "^1.10",
+    "phpstan/extension-installer": "^1.4"
   },
   "scripts": {
     "test": "vendor/bin/phpunit",
@@ -58,5 +59,10 @@
     }
   },
   "minimum-stability": "dev",
-  "prefer-stable": true
+  "prefer-stable": true,
+  "config": {
+    "allow-plugins": {
+      "phpstan/extension-installer": true
+    }
+  }
 }

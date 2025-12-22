@@ -60,12 +60,5 @@ class RequestTrackerServiceProvider extends ServiceProvider
                 OutboundRequestMiddleware::handle()
             );
         });
-
-        // Explicit opt-out
-        Http::macro('untracked', function () {
-            return Http::withoutMiddleware(
-                OutboundRequestMiddleware::handle()
-            );
-        });
     }
 }
