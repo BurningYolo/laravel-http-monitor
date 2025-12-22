@@ -31,7 +31,7 @@ class OutboundRequest extends Model
     protected $casts = [
         'headers' => 'array',
         'response_headers' => 'array',
-        'duration_ms' => 'integer',
+        'duration_ms' => 'float',
         'status_code' => 'integer',
         'user_id' => 'integer',
         'successful' => 'boolean',

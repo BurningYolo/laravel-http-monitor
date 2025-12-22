@@ -112,7 +112,7 @@ class OutboundRequestMiddleware
                     ? $response->getHeaders()
                     : null,
                 'response_body' => $responseBody,
-                'duration_ms' => round($duration, 2),
+                'duration_ms' => $duration,
                 'user_id' => Auth::id(),
                 'user_type' => Auth::check() ? get_class(Auth::user()) : null,
                 'triggered_by' => $triggeredBy,

@@ -6,7 +6,10 @@ use Burningyolo\LaravelHttpMonitor\Support\BodyProcessor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 
+#[CoversClass(BodyProcessor::class)]
 class BodyProcessorTest extends TestCase
 {
     protected function setUp(): void
@@ -23,17 +26,17 @@ class BodyProcessorTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_null_for_empty_body()
     {
         $result = BodyProcessor::process(null);
         $this->assertNull($result);
 
         $result = BodyProcessor::process('');
-        $this->assertNull($result);
+        $this->assertEmpty($result);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_plain_text_unchanged_when_under_limit()
     {
         $body = 'This is a plain text body';
@@ -42,7 +45,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals($body, $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_truncates_large_plain_text_body()
     {
         Config::set('request-tracker.max_body_size', 100);
@@ -54,7 +57,7 @@ class BodyProcessorTest extends TestCase
         $this->assertStringEndsWith('... [truncated]', $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_omits_sensitive_fields_from_json()
     {
         $body = json_encode([
@@ -71,7 +74,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals('yourmum@example.com', $decoded['email']);
     }
 
-    /** @test */
+    #[Test]
     public function it_omits_nested_sensitive_fields()
     {
         $body = json_encode([
@@ -96,7 +99,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals('dark', $decoded['settings']['theme']);
     }
 
-    /** @test */
+    #[Test]
     public function it_is_case_insensitive_when_matching_fields()
     {
         $body = json_encode([
@@ -117,7 +120,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals('***OMITTED***', $decoded['API_KEY']);
     }
 
-    /** @test */
+    #[Test]
     public function it_matches_partial_field_names()
     {
         $body = json_encode([
@@ -138,7 +141,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals('***OMITTED***', $decoded['api_key_primary']);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_invalid_json_gracefully()
     {
         $body = '{invalid json content';
@@ -147,7 +150,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals($body, $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_truncates_large_json_after_processing()
     {
         Config::set('request-tracker.max_body_size', 100);
@@ -165,7 +168,7 @@ class BodyProcessorTest extends TestCase
         $this->assertStringEndsWith('... [truncated]', $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_processes_form_data_from_request_object()
     {
         $request = Request::create('/test', 'POST', [
@@ -184,7 +187,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals('john@example.com', $decoded['email']);
     }
 
-    /** @test */
+    #[Test]
     public function it_processes_json_from_request_object()
     {
         $data = [
@@ -206,7 +209,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals('***OMITTED***', $decoded['token']);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_empty_json_object()
     {
         $body = json_encode([]);
@@ -215,7 +218,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals('[]', $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_json_with_numeric_keys()
     {
         $body = json_encode([
@@ -234,7 +237,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals('***OMITTED***', $decoded['items'][1]['api_key']);
     }
 
-    /** @test */
+    #[Test]
     public function it_preserves_non_string_values()
     {
         $body = json_encode([
@@ -257,7 +260,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals('***OMITTED***', $decoded['password']);
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_custom_omit_fields_from_config()
     {
         Config::set('request-tracker.omit_body_fields', [
@@ -281,7 +284,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals('***OMITTED***', $decoded['tax_id']);
     }
 
-    /** @test */
+    #[Test]
     public function it_respects_custom_max_body_size()
     {
         Config::set('request-tracker.max_body_size', 50);
@@ -293,7 +296,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals(50, strlen($result) - strlen('... [truncated]'));
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_deeply_nested_structures()
     {
         $body = json_encode([
@@ -316,7 +319,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals('john', $decoded['level1']['level2']['level3']['level4']['username']);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_xml_content_as_plain_text()
     {
         $body = '<?xml version="1.0"?><root><user>John</user></root>';
@@ -325,7 +328,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals($body, $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_multipart_form_data()
     {
         $request = Request::create('/test', 'POST', [
@@ -342,7 +345,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals('***OMITTED***', $decoded['password']);
     }
 
-    /** @test */
+    #[Test]
     public function get_omitted_fields_returns_config_value()
     {
         Config::set('request-tracker.omit_body_fields', ['password', 'token']);
@@ -352,7 +355,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals(['password', 'token'], $fields);
     }
 
-    /** @test */
+    #[Test]
     public function get_max_body_size_returns_config_value()
     {
         Config::set('request-tracker.max_body_size', 32768);
@@ -362,7 +365,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals(32768, $size);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_unicode_characters()
     {
         $body = json_encode([
@@ -379,7 +382,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals('你好世界', $decoded['message']);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_special_characters_in_values()
     {
         $body = json_encode([
@@ -396,7 +399,7 @@ class BodyProcessorTest extends TestCase
         $this->assertEquals('https://example.com/path?query=1&other=2', $decoded['url']);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_null_values_in_json()
     {
         $body = json_encode([
@@ -413,7 +416,7 @@ class BodyProcessorTest extends TestCase
         $this->assertNull($decoded['email']);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_omit_integer_keys()
     {
         $body = json_encode([

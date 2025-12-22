@@ -10,7 +10,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Config;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 
+#[CoversClass(TrackInboundRequest::class)]
 class TrackInboundRequestTest extends TestCase
 {
     use RefreshDatabase;
@@ -33,7 +36,7 @@ class TrackInboundRequestTest extends TestCase
         Config::set('request-tracker.fetch_geo_data', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_tracks_inbound_requests()
     {
         $middleware = new TrackInboundRequest;
@@ -51,7 +54,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertEquals('/test', $tracked->path);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_track_when_disabled()
     {
         Config::set('request-tracker.enabled', false);
@@ -66,7 +69,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertEquals(0, InboundRequest::count());
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_track_inbound_when_disabled()
     {
         Config::set('request-tracker.track_inbound', false);
@@ -81,7 +84,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertEquals(0, InboundRequest::count());
     }
 
-    /** @test */
+    #[Test]
     public function it_excludes_paths_matching_patterns()
     {
         Config::set('request-tracker.excluded_paths', ['admin*', 'telescope*']);
@@ -103,7 +106,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertEquals('/api/users', InboundRequest::first()->path);
     }
 
-    /** @test */
+    #[Test]
     public function it_omits_sensitive_fields_from_request_body()
     {
         $middleware = new TrackInboundRequest;
@@ -126,7 +129,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertEquals('john@example.com', $body['email']);
     }
 
-    /** @test */
+    #[Test]
     public function it_omits_sensitive_fields_from_response_body()
     {
         $middleware = new TrackInboundRequest;
@@ -148,7 +151,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertEquals('***OMITTED***', $body['token']);
     }
 
-    /** @test */
+    #[Test]
     public function it_truncates_large_request_bodies()
     {
         Config::set('request-tracker.max_body_size', 100);
@@ -164,7 +167,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertLessThanOrEqual(100 + strlen('... [truncated]'), strlen($tracked->request_body));
     }
 
-    /** @test */
+    #[Test]
     public function it_stores_headers_when_enabled()
     {
         Config::set('request-tracker.store_headers', true);
@@ -181,7 +184,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertIsArray($tracked->headers);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_store_headers_when_disabled()
     {
         Config::set('request-tracker.store_headers', false);
@@ -195,7 +198,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertNull($tracked->headers);
     }
 
-    /** @test */
+    #[Test]
     public function it_stores_body_when_enabled()
     {
         Config::set('request-tracker.store_body', true);
@@ -212,7 +215,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertNotNull($tracked->request_body);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_store_body_when_disabled()
     {
         Config::set('request-tracker.store_body', false);
@@ -230,7 +233,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertNull($tracked->response_body);
     }
 
-    /** @test */
+    #[Test]
     public function it_tracks_response_status_code()
     {
         $middleware = new TrackInboundRequest;
@@ -242,7 +245,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertEquals(404, $tracked->status_code);
     }
 
-    /** @test */
+    #[Test]
     public function it_tracks_request_duration()
     {
         $middleware = new TrackInboundRequest;
@@ -259,7 +262,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertGreaterThanOrEqual(10, $tracked->duration_ms);
     }
 
-    /** @test */
+    #[Test]
     public function it_tracks_ip_address()
     {
         $middleware = new TrackInboundRequest;
@@ -272,10 +275,10 @@ class TrackInboundRequestTest extends TestCase
         $this->assertNotNull($tracked->tracked_ip_id);
 
         $trackedIp = TrackedIp::find($tracked->tracked_ip_id);
-        $this->assertEquals('192.168.1.100', $trackedIp->ip);
+        $this->assertEquals('192.168.1.100', $trackedIp->ip_address);
     }
 
-    /** @test */
+    #[Test]
     public function it_tracks_user_agent()
     {
         $middleware = new TrackInboundRequest;
@@ -288,7 +291,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertEquals('Mozilla/5.0', $tracked->user_agent);
     }
 
-    /** @test */
+    #[Test]
     public function it_tracks_referer()
     {
         $middleware = new TrackInboundRequest;
@@ -301,7 +304,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertEquals('https://google.com', $tracked->referer);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_form_data_correctly()
     {
         $middleware = new TrackInboundRequest;
@@ -320,7 +323,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertEquals('***OMITTED***', $body['password']);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_query_strings()
     {
         $middleware = new TrackInboundRequest;
@@ -329,10 +332,18 @@ class TrackInboundRequestTest extends TestCase
         $middleware->handle($request, fn ($req) => new Response('OK', 200));
 
         $tracked = InboundRequest::first();
-        $this->assertEquals('page=1&limit=10', $tracked->query_string);
+
+        // Parse the query string into an array
+        parse_str($tracked->query_string, $params);
+
+        // Assert the parameters match expected values
+        $this->assertEquals([
+            'page' => '1',
+            'limit' => '10',
+        ], $params);
     }
 
-    /** @test */
+    #[Test]
     public function it_tracks_full_url()
     {
         $middleware = new TrackInboundRequest;
@@ -345,7 +356,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertStringContainsString('page=1', $tracked->full_url);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_fail_on_missing_response_methods()
     {
         $middleware = new TrackInboundRequest;
@@ -366,7 +377,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertNull($tracked->status_code);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_json_content_type()
     {
         $middleware = new TrackInboundRequest;
@@ -384,7 +395,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertEquals('***OMITTED***', $body['password']);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_multipart_form_data()
     {
         $middleware = new TrackInboundRequest;
@@ -403,7 +414,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertEquals('***OMITTED***', $body['token']);
     }
 
-    /** @test */
+    #[Test]
     public function it_continues_tracking_even_if_exception_occurs()
     {
         $middleware = new TrackInboundRequest;
@@ -421,7 +432,7 @@ class TrackInboundRequestTest extends TestCase
         $this->assertEquals(1, InboundRequest::count());
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_nested_sensitive_data()
     {
         $middleware = new TrackInboundRequest;

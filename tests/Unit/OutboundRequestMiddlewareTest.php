@@ -4,7 +4,6 @@ namespace Burningyolo\LaravelHttpMonitor\Tests\Feature;
 
 use Burningyolo\LaravelHttpMonitor\Http\OutboundRequestMiddleware;
 use Burningyolo\LaravelHttpMonitor\Models\OutboundRequest;
-use Burningyolo\LaravelHttpMonitor\Models\TrackedIp;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -12,7 +11,10 @@ use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 
+#[CoversClass(OutboundRequestMiddleware::class)]
 class OutboundRequestMiddlewareTest extends TestCase
 {
     use RefreshDatabase;
@@ -43,7 +45,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         return new Client(['handler' => $handlerStack]);
     }
 
-    /** @test */
+    #[Test]
     public function it_tracks_outbound_requests()
     {
         $client = $this->createMockClient([
@@ -61,7 +63,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertStringContainsString('/users', $tracked->url);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_track_when_disabled()
     {
         Config::set('request-tracker.enabled', false);
@@ -75,7 +77,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertEquals(0, OutboundRequest::count());
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_track_outbound_when_disabled()
     {
         Config::set('request-tracker.track_outbound', false);
@@ -89,7 +91,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertEquals(0, OutboundRequest::count());
     }
 
-    /** @test */
+    #[Test]
     public function it_excludes_configured_hosts()
     {
         Config::set('request-tracker.excluded_outbound_hosts', ['localhost', 'internal-api.com']);
@@ -108,7 +110,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertEquals('external-api.com', OutboundRequest::first()->host);
     }
 
-    /** @test */
+    #[Test]
     public function it_omits_sensitive_fields_from_request_body()
     {
         $client = $this->createMockClient([
@@ -131,7 +133,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertEquals('john@example.com', $body['email']);
     }
 
-    /** @test */
+    #[Test]
     public function it_omits_sensitive_fields_from_response_body()
     {
         $client = $this->createMockClient([
@@ -152,7 +154,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertEquals('john@example.com', $body['email']);
     }
 
-    /** @test */
+    #[Test]
     public function it_truncates_large_request_bodies()
     {
         Config::set('request-tracker.max_body_size', 100);
@@ -171,7 +173,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertLessThanOrEqual(100 + strlen('... [truncated]'), strlen($tracked->request_body));
     }
 
-    /** @test */
+    #[Test]
     public function it_truncates_large_response_bodies()
     {
         Config::set('request-tracker.max_body_size', 100);
@@ -187,7 +189,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertStringEndsWith('... [truncated]', $tracked->response_body);
     }
 
-    /** @test */
+    #[Test]
     public function it_tracks_status_code()
     {
         $client = $this->createMockClient([
@@ -202,20 +204,20 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertEquals(404, $tracked->status_code);
     }
 
-    /** @test */
+    #[Test]
     public function it_tracks_request_duration()
     {
         $client = $this->createMockClient([
             new GuzzleResponse(200, [], 'OK'),
         ]);
 
-        $client->get('https://api.example.com/test');
+        $client->get('https://google.com');
 
         $tracked = OutboundRequest::first();
         $this->assertGreaterThan(0, $tracked->duration_ms);
     }
 
-    /** @test */
+    #[Test]
     public function it_marks_failed_requests()
     {
         $client = $this->createMockClient([
@@ -232,7 +234,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertEquals(500, $tracked->status_code);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_network_errors()
     {
         $mock = new MockHandler([
@@ -258,7 +260,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertStringContainsString('Connection refused', $tracked->error_message);
     }
 
-    /** @test */
+    #[Test]
     public function it_stores_headers_when_enabled()
     {
         Config::set('request-tracker.store_headers', true);
@@ -276,7 +278,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertNotNull($tracked->response_headers);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_store_headers_when_disabled()
     {
         Config::set('request-tracker.store_headers', false);
@@ -292,7 +294,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertNull($tracked->response_headers);
     }
 
-    /** @test */
+    #[Test]
     public function it_stores_body_when_enabled()
     {
         Config::set('request-tracker.store_body', true);
@@ -310,7 +312,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertNotNull($tracked->response_body);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_store_body_when_disabled()
     {
         Config::set('request-tracker.store_body', false);
@@ -328,7 +330,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertNull($tracked->response_body);
     }
 
-    /** @test */
+    #[Test]
     public function it_tracks_post_requests_with_json()
     {
         $client = $this->createMockClient([
@@ -351,7 +353,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertEquals('***OMITTED***', $body['password']);
     }
 
-    /** @test */
+    #[Test]
     public function it_tracks_put_requests()
     {
         $client = $this->createMockClient([
@@ -366,7 +368,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertEquals('PUT', $tracked->method);
     }
 
-    /** @test */
+    #[Test]
     public function it_tracks_delete_requests()
     {
         $client = $this->createMockClient([
@@ -380,7 +382,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertEquals(204, $tracked->status_code);
     }
 
-    /** @test */
+    #[Test]
     public function it_tracks_query_strings()
     {
         $client = $this->createMockClient([
@@ -393,25 +395,38 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertEquals('page=1&limit=10', $tracked->query_string);
     }
 
-    /** @test */
-    public function it_resolves_host_ip_address()
+    #[Test]
+    public function it_resolves_acutal_host_ip_address()
     {
         $client = $this->createMockClient([
             new GuzzleResponse(200, [], 'OK'),
         ]);
 
-        $client->get('https://api.example.com/test');
+        $client->get('https://google.com');
 
-        $tracked = OutboundRequest::first();
+        $tracked = OutboundRequest::with('trackedIp')->first();
 
-        if ($tracked->tracked_ip_id) {
-            $trackedIp = TrackedIp::find($tracked->tracked_ip_id);
-            $this->assertNotNull($trackedIp);
-            $this->assertNotEmpty($trackedIp->ip);
-        }
+        $this->assertNotNull($tracked);
+        $this->assertNotNull($tracked->trackedIp);
+        $this->assertNotEmpty($tracked->trackedIp->ip_address);
     }
 
-    /** @test */
+    #[Test]
+    public function it_handles_fake_host_ip_address()
+    {
+        $client = $this->createMockClient([
+            new GuzzleResponse(200, [], 'OK'),
+        ]);
+
+        $client->get('https://api.example.com/');
+
+        $tracked = OutboundRequest::with('trackedIp')->first();
+
+        $this->assertNotNull($tracked);
+        $this->assertNull($tracked->trackedIp);
+    }
+
+    #[Test]
     public function it_handles_nested_sensitive_data()
     {
         $client = $this->createMockClient([
@@ -438,7 +453,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertEquals('***OMITTED***', $body['user']['credentials']['api_key']);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_plain_text_bodies()
     {
         $client = $this->createMockClient([
@@ -454,7 +469,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertEquals('Plain text response', $tracked->response_body);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_empty_response_body()
     {
         $client = $this->createMockClient([
@@ -464,10 +479,10 @@ class OutboundRequestMiddlewareTest extends TestCase
         $client->delete('https://api.example.com/resource/1');
 
         $tracked = OutboundRequest::first();
-        $this->assertNull($tracked->response_body);
+        $this->assertEmpty($tracked->response_body);
     }
 
-    /** @test */
+    #[Test]
     public function it_tracks_path_correctly()
     {
         $client = $this->createMockClient([
@@ -480,7 +495,7 @@ class OutboundRequestMiddlewareTest extends TestCase
         $this->assertEquals('/v1/users/123/profile', $tracked->path);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_concurrent_requests()
     {
         $client = $this->createMockClient([
