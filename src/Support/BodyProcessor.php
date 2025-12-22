@@ -10,77 +10,95 @@ class BodyProcessor
 {
     public static function process(?string $body, ?Request $request = null): ?string
     {
-        if (empty($body)) {
-            return null;
-        }
+         if(!is_string($body))
+            {
+                return null ; 
+            }  
 
         $maxSize = Config::get('request-tracker.max_body_size', 65536);
 
+        $data = self::extractData($body , $request);
+
+        if (is_array($data)) {
+            return self::processArrayData($data, $maxSize, $body ?? '');
+        }
+
+         // Not JSON or failed to decode, just return as-is (pehaly se size checked)
         if (strlen($body) > $maxSize) {
             return substr($body, 0, $maxSize).'... [truncated]';
         }
 
-        $data = self::extractData($body, $request);
-
-        if (is_array($data)) {
-            return self::processArrayData($data, $maxSize, $body);
-        }
-
-        // Not JSON or failed to decode, just return as-is (pehaly se size checked)
         return $body;
     }
 
-    protected static function extractData(string $body, ?Request $request = null): ?array
-    {
-
-        if ($request instanceof Request) {
-            $contentType = $request->header('Content-Type', '');
-
-            if (Str::contains($contentType, ['application/json', 'application/ld+json'])) {
-                $jsonData = $request->json()->all();
-                if (! empty($jsonData)) {
-                    return $jsonData;
-                }
-            } elseif (Str::contains($contentType, ['application/x-www-form-urlencoded', 'multipart/form-data'])) {
-                $formData = $request->all();
-                if (! empty($formData)) {
-                    return $formData;
-                }
+protected static function extractData(string $body, ?Request $request = null): ?array
+{
+    if ($request instanceof Request) {
+        if ($request->isJson()) {
+            $json = $request->json()->all();
+            if (! empty($json)) {
+                return $json;
             }
         }
 
+        $input = $request->all();
+        if (! empty($input)) {
+            return $input;
+        }
+    }
+
+    if (! empty($body) || $body === '0') {
         $decoded = json_decode($body, true);
         if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
             return $decoded;
         }
-
-        return null;
     }
+
+    return null;
+}
 
     /**
      * Process array data by omitting sensitive fields  (functions probably nhi chahiye but it aight)
      */
-    protected static function processArrayData(array $data, int $maxSize, string $originalBody): string
+protected static function processArrayData(array $data, int $maxSize, string $originalBody): string
     {
         $omittedFields = Config::get('request-tracker.omit_body_fields', []);
 
         $processed = self::omitSensitiveFields($data, $omittedFields);
         $encoded = json_encode($processed, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-        if ($encoded !== false && strlen($encoded) <= $maxSize) {
-            return $encoded;
+        if ($encoded === false) {
+            // JSON encoding failed, truncate original
+            if (strlen($originalBody) > $maxSize) {
+                return substr($originalBody, 0, $maxSize).'... [truncated]';
+            }
+            return $originalBody;
         }
 
-        $bodyToTruncate = $encoded !== false ? $encoded : $originalBody;
+        // Truncate if needed
+        if (strlen($encoded) > $maxSize) {
+            return substr($encoded, 0, $maxSize).'... [truncated]';
+        }
 
-        return substr($bodyToTruncate, 0, $maxSize).'... [truncated]';
+        return $encoded;
     }
 
-    protected static function omitSensitiveFields(array $data, array $fieldsToOmit): array
+
+ protected static function omitSensitiveFields(array $data, array $fieldsToOmit): array
     {
         $result = [];
 
         foreach ($data as $key => $value) {
+            // Skip numeric keys (array indices) - only check string keys
+            if (is_int($key)) {
+                if (is_array($value)) {
+                    $result[$key] = self::omitSensitiveFields($value, $fieldsToOmit);
+                } else {
+                    $result[$key] = $value;
+                }
+                continue;
+            }
+
             if (self::shouldOmitField($key, $fieldsToOmit)) {
                 $result[$key] = '***OMITTED***';
             } elseif (is_array($value)) {
@@ -102,15 +120,15 @@ class BodyProcessor
         }
 
         foreach ($fieldsToOmit as $omitField) {
-            // Case-insensitive exact match or contains check
-            if (strcasecmp($key, $omitField) === 0 ||
-                stripos($key, $omitField) !== false) {
+            // Case-insensitive partial match (contains check)
+            if (stripos($key, $omitField) !== false) {
                 return true;
             }
         }
 
         return false;
     }
+
 
     // tests mein use kring ye fucntions , probably better way to do this but for now it aight
     public static function getOmittedFields(): array

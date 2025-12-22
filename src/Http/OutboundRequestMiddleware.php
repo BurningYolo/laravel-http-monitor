@@ -101,22 +101,18 @@ class OutboundRequestMiddleware
                 'url' => (string) $uri,
                 'host' => $host,
                 'full_url' => (string) $uri,
-                'path' => $uri->getPath(),
-                'query_string' => $uri->getQuery(),
+                'path' => $uri->getPath() ?: '/',
+                'query_string' => $uri->getQuery() ?: null,
                 'headers' => Config::get('request-tracker.store_headers')
                     ? $request->getHeaders()
                     : null,
-                'request_body' => Config::get('request-tracker.store_body')
-                    ? (string) $request->getBody()
-                    : null,
+                'request_body' => $requestBody,
                 'status_code' => $response?->getStatusCode(),
                 'response_headers' => $response && Config::get('request-tracker.store_headers')
                     ? $response->getHeaders()
                     : null,
-                'response_body' => $response && Config::get('request-tracker.store_body')
-                    ? (string) $response->getBody()
-                    : null,
-                'duration_ms' => round($duration),
+                'response_body' => $responseBody,
+                'duration_ms' => round($duration, 2),
                 'user_id' => Auth::id(),
                 'user_type' => Auth::check() ? get_class(Auth::user()) : null,
                 'triggered_by' => $triggeredBy,
