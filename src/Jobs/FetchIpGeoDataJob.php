@@ -17,8 +17,6 @@ class FetchIpGeoDataJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-
-
     protected int $trackedIpId;
 
     public function __construct(int $trackedIpId)
@@ -244,5 +242,4 @@ class FetchIpGeoDataJob implements ShouldQueue
             'organization' => $data['org'] ?? null,
         ];
     }
-
 }

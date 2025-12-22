@@ -15,10 +15,9 @@ class BodyProcessor
         }
 
         $maxSize = Config::get('request-tracker.max_body_size', 65536);
-        
-    
+
         if (strlen($body) > $maxSize) {
-            return substr($body, 0, $maxSize) . '... [truncated]';
+            return substr($body, 0, $maxSize).'... [truncated]';
         }
 
         $data = self::extractData($body, $request);
@@ -31,21 +30,20 @@ class BodyProcessor
         return $body;
     }
 
-
     protected static function extractData(string $body, ?Request $request = null): ?array
     {
-    
+
         if ($request instanceof Request) {
             $contentType = $request->header('Content-Type', '');
-            
+
             if (Str::contains($contentType, ['application/json', 'application/ld+json'])) {
                 $jsonData = $request->json()->all();
-                if (!empty($jsonData)) {
+                if (! empty($jsonData)) {
                     return $jsonData;
                 }
             } elseif (Str::contains($contentType, ['application/x-www-form-urlencoded', 'multipart/form-data'])) {
                 $formData = $request->all();
-                if (!empty($formData)) {
+                if (! empty($formData)) {
                     return $formData;
                 }
             }
@@ -68,14 +66,14 @@ class BodyProcessor
 
         $processed = self::omitSensitiveFields($data, $omittedFields);
         $encoded = json_encode($processed, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        
+
         if ($encoded !== false && strlen($encoded) <= $maxSize) {
             return $encoded;
         }
-        
-        
+
         $bodyToTruncate = $encoded !== false ? $encoded : $originalBody;
-        return substr($bodyToTruncate, 0, $maxSize) . '... [truncated]';
+
+        return substr($bodyToTruncate, 0, $maxSize).'... [truncated]';
     }
 
     protected static function omitSensitiveFields(array $data, array $fieldsToOmit): array
@@ -99,18 +97,29 @@ class BodyProcessor
     protected static function shouldOmitField($key, array $fieldsToOmit): bool
     {
         // Skip non-string keys
-        if (!is_string($key)) {
+        if (! is_string($key)) {
             return false;
         }
 
         foreach ($fieldsToOmit as $omitField) {
             // Case-insensitive exact match or contains check
-            if (strcasecmp($key, $omitField) === 0 || 
+            if (strcasecmp($key, $omitField) === 0 ||
                 stripos($key, $omitField) !== false) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    // tests mein use kring ye fucntions , probably better way to do this but for now it aight
+    public static function getOmittedFields(): array
+    {
+        return Config::get('request-tracker.omit_body_fields', []);
+    }
+
+    public static function getMaxBodySize(): int
+    {
+        return Config::get('request-tracker.max_body_size', 65536);
     }
 }

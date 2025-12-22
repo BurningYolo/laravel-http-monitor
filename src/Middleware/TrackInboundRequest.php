@@ -5,6 +5,7 @@ namespace Burningyolo\LaravelHttpMonitor\Middleware;
 use Burningyolo\LaravelHttpMonitor\Jobs\FetchIpGeoDataJob;
 use Burningyolo\LaravelHttpMonitor\Models\InboundRequest;
 use Burningyolo\LaravelHttpMonitor\Models\TrackedIp;
+use Burningyolo\LaravelHttpMonitor\Support\BodyProcessor;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +16,6 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Burningyolo\LaravelHttpMonitor\Support\BodyProcessor; 
 
 class TrackInboundRequest
 {
@@ -69,7 +69,7 @@ class TrackInboundRequest
             $response instanceof StreamedResponse ||
             $response instanceof BinaryFileResponse;
 
-                // Process request body using BodyProcessor
+        // Process request body using BodyProcessor
         $requestBody = null;
         if (Config::get('request-tracker.store_body')) {
             $rawBody = $request->getContent();

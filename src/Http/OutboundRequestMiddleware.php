@@ -4,13 +4,13 @@ namespace Burningyolo\LaravelHttpMonitor\Http;
 
 use Burningyolo\LaravelHttpMonitor\Models\OutboundRequest;
 use Burningyolo\LaravelHttpMonitor\Models\TrackedIp;
+use Burningyolo\LaravelHttpMonitor\Support\BodyProcessor;
 use Closure;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Psr\Http\Message\RequestInterface;
-use Burningyolo\LaravelHttpMonitor\Support\BodyProcessor; 
 
 class OutboundRequestMiddleware
 {
