@@ -3,9 +3,23 @@
   "description": "Track inbound and outbound HTTP requests with IP geolocation data",
   "type": "library",
   "license": "MIT",
+  "keywords": [
+    "laravel",
+    "http",
+    "monitoring",
+    "tracking",
+    "requests",
+    "analytics",
+    "geo-location"
+  ],
   "autoload": {
     "psr-4": {
       "Burningyolo\\LaravelHttpMonitor\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Burningyolo\\LaravelHttpMonitor\\Tests\\": "tests/"
     }
   },
   "authors": [
@@ -20,11 +34,21 @@
     "illuminate/http": "^10.0|^11.0|^12.0",
     "illuminate/database": "^10.0|^11.0|^12.0",
     "illuminate/queue": "^10.0|^11.0|^12.0",
-    "illuminate/contracts": "^10.0|^11.0|^12.0"
+    "illuminate/contracts": "^10.0|^11.0|^12.0",
+    "guzzlehttp/guzzle": "^7.0"
   },
   "require-dev": {
     "orchestra/testbench": "^8.0|^9.0|^10.0",
-    "laravel/pint": "^1.26"
+    "phpunit/phpunit": "^10.0|^11.0",
+    "mockery/mockery": "^1.5",
+    "laravel/pint": "^1.26",
+    "phpstan/phpstan": "^1.10"
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit",
+    "test-coverage": "vendor/bin/phpunit --coverage-html coverage",
+    "format": "vendor/bin/pint",
+    "analyse": "vendor/bin/phpstan analyse"
   },
   "extra": {
     "laravel": {
