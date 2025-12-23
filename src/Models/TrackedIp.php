@@ -29,10 +29,15 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder|TrackedIp newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TrackedIp newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TrackedIp query()
- * @method static \Illuminate\Database\Eloquent\Builder|TrackedIp find(int $attributes)
- * @method static \Illuminate\Database\Eloquent\Builder|TrackedIp findOrFail(int $attributes)
+ * @method static \Illuminate\Database\Eloquent\Builder|TrackedIp find(int $id)
+ * @method static \Illuminate\Database\Eloquent\Builder|TrackedIp findOrFail(int $id)
  * @method static \Illuminate\Database\Eloquent\Builder|TrackedIp firstOrCreate(array $attributes = [], array $values = [])
  * @method static \Illuminate\Database\Eloquent\Builder|TrackedIp where(string $column, mixed $operator = null, mixed $value = null)
+ * @method static \Illuminate\Database\Eloquent\Builder|TrackedIp whereNotNull(string $column)
+ * @method static \Illuminate\Database\Eloquent\Builder|TrackedIp whereDoesntHave(string $relation, \Closure $callback = null)
+ * @method static int count(string $columns = '*')
+ * @method static bool truncate()
+ * @method static int delete()
  */
 class TrackedIp extends Model
 {

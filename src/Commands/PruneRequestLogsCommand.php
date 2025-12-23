@@ -1,6 +1,6 @@
 <?php
 
-namespace Burningyolo\LaravelHttpMonitor\Console\Commands;
+namespace Burningyolo\LaravelHttpMonitor\Commands;
 
 use Burningyolo\LaravelHttpMonitor\Models\InboundRequest;
 use Burningyolo\LaravelHttpMonitor\Models\OutboundRequest;

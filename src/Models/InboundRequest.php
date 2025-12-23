@@ -39,6 +39,12 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder|InboundRequest find(int $id)
  * @method static \Illuminate\Database\Eloquent\Builder|InboundRequest findOrFail(int $id)
  * @method static \Illuminate\Database\Eloquent\Builder|InboundRequest where(string $column, mixed $operator = null, mixed $value = null)
+ * @method static \Illuminate\Database\Eloquent\Builder|InboundRequest whereNotNull(string $column)
+ * @method static \Illuminate\Database\Eloquent\Builder|InboundRequest oldest(string $column = 'created_at')
+ * @method static int count(string $columns = '*')
+ * @method static bool truncate()
+ * @method static int delete()
+ * @method static float|null avg(string $column)
  */
 class InboundRequest extends Model
 {

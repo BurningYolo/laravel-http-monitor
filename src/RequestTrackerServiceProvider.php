@@ -2,10 +2,10 @@
 
 namespace Burningyolo\LaravelHttpMonitor;
 
-use Burningyolo\LaravelHttpMonitor\Console\Commands\CleanupRequestLogsCommand;
-use Burningyolo\LaravelHttpMonitor\Console\Commands\ClearAllLogsCommand;
-use Burningyolo\LaravelHttpMonitor\Console\Commands\PruneRequestLogsCommand;
-use Burningyolo\LaravelHttpMonitor\Console\Commands\ShowStatsCommand;
+use Burningyolo\LaravelHttpMonitor\Commands\CleanupRequestLogsCommand;
+use Burningyolo\LaravelHttpMonitor\Commands\ClearAllLogsCommand;
+use Burningyolo\LaravelHttpMonitor\Commands\PruneRequestLogsCommand;
+use Burningyolo\LaravelHttpMonitor\Commands\ShowStatsCommand;
 use Burningyolo\LaravelHttpMonitor\Http\OutboundRequestMiddleware;
 use Burningyolo\LaravelHttpMonitor\Middleware\TrackInboundRequest;
 use Illuminate\Routing\Router;
