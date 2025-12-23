@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('inbound_requests', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tracked_ip_id')->nullable()->constrained('tracked_ips')->nullOnDelete();
+            $table->foreignId('tracked_ip_id')->nullable()->constrained('tracked_ips')->cascadeOnDelete();
 
             // Request details
             $table->string('method', 10);
