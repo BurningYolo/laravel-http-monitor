@@ -60,8 +60,8 @@ class RequestTrackerServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../config/request-tracker.php',
-            'request-tracker'
+            __DIR__.'/../config/http-monitor.php',
+            'http-monitor-config'
         );
 
         // Delay until Laravel is fully booted (Laravel 9–11 safe)
