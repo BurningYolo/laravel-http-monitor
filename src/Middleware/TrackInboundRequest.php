@@ -97,7 +97,7 @@ class TrackInboundRequest
         if (! str_starts_with($path, '/')) {
             $path = '/'.$path;
         }
-        
+
         InboundRequest::create([
             'tracked_ip_id' => $trackedIp?->getKey(),
             'method' => $request->method(),

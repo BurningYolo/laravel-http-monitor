@@ -30,7 +30,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property-read TrackedIp|null $trackedIp
- * 
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|InboundRequest newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|InboundRequest newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|InboundRequest query()

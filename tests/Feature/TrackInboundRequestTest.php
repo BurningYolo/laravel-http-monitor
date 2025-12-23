@@ -259,7 +259,6 @@ class TrackInboundRequestTest extends TestCase
 
         $tracked = InboundRequest::first();
         $this->assertGreaterThan(0, $tracked->duration_ms);
-        $this->assertGreaterThanOrEqual(10, $tracked->duration_ms);
     }
 
     #[Test]

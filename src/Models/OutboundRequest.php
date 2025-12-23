@@ -29,7 +29,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property-read TrackedIp|null $trackedIp
- * 
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|OutboundRequest newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OutboundRequest newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OutboundRequest query()

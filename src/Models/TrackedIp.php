@@ -25,7 +25,7 @@ use Illuminate\Support\Carbon;
  * @property int $request_count
  * @property-read \Illuminate\Database\Eloquent\Collection|InboundRequest[] $inboundRequests
  * @property-read \Illuminate\Database\Eloquent\Collection|OutboundRequest[] $outboundRequests
- * 
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|TrackedIp newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TrackedIp newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TrackedIp query()
