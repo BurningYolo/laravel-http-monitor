@@ -186,6 +186,8 @@ Stores outgoing HTTP requests with similar structure plus fields for tracking wh
 
 Stores unique IP addresses with optional geolocation data including country, region, city, coordinates, timezone, ISP, and organization.
 
+View the model files `src/Models/` to get more info about the columns.
+
 ## Some Considerations
 
 - Enable `geo_dispatch_async` to fetch geolocation data in background jobs
