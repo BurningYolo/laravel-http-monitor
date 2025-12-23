@@ -14,10 +14,6 @@ use Psr\Http\Message\RequestInterface;
 
 class OutboundRequestMiddleware
 {
-    /**
-     * SINGLE shared middleware instance.
-     * Required so withoutMiddleware() works correctly.
-     */
     public static function handle(): Closure
     {
         static $middleware;

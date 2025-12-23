@@ -51,7 +51,7 @@ return [
     | Store Request Body
     |--------------------------------------------------------------------------
     |
-    | Whether to store the request/response body.
+    | Whether to store the request/response body. Recommended disabled cuz this will eat memory
     |
     */
     'store_body' => env('REQUEST_TRACKER_STORE_BODY', false),
@@ -238,10 +238,10 @@ return [
 
     'retention' => [
         // Number of days to keep inbound request logs
-        'inbound_days' => env('REQUEST_TRACKER_RETENTION_INBOUND', 30),
+        'inbound_days' => env('REQUEST_TRACKER_RETENTION_INBOUND', 7),
 
         // Number of days to keep outbound request logs
-        'outbound_days' => env('REQUEST_TRACKER_RETENTION_OUTBOUND', 30),
+        'outbound_days' => env('REQUEST_TRACKER_RETENTION_OUTBOUND', 7),
     ],
 
 ];
