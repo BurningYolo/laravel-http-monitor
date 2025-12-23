@@ -225,4 +225,23 @@ return [
         'localhost',
         '::1',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Data Retention Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configure how long to keep request logs before they can be pruned.
+    | Set to null to disable automatic pruning for that type.
+    |
+    */
+
+    'retention' => [
+        // Number of days to keep inbound request logs
+        'inbound_days' => env('REQUEST_TRACKER_RETENTION_INBOUND', 30),
+
+        // Number of days to keep outbound request logs
+        'outbound_days' => env('REQUEST_TRACKER_RETENTION_OUTBOUND', 30),
+    ],
+
 ];

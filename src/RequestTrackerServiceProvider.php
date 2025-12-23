@@ -2,6 +2,10 @@
 
 namespace Burningyolo\LaravelHttpMonitor;
 
+use Burningyolo\LaravelHttpMonitor\Console\Commands\CleanupRequestLogsCommand;
+use Burningyolo\LaravelHttpMonitor\Console\Commands\ClearAllLogsCommand;
+use Burningyolo\LaravelHttpMonitor\Console\Commands\PruneRequestLogsCommand;
+use Burningyolo\LaravelHttpMonitor\Console\Commands\ShowStatsCommand;
 use Burningyolo\LaravelHttpMonitor\Http\OutboundRequestMiddleware;
 use Burningyolo\LaravelHttpMonitor\Middleware\TrackInboundRequest;
 use Illuminate\Routing\Router;
@@ -13,6 +17,16 @@ class RequestTrackerServiceProvider extends ServiceProvider
 {
     public function boot()
     {
+
+        // Register commands
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                CleanupRequestLogsCommand::class,
+                PruneRequestLogsCommand::class,
+                ShowStatsCommand::class,
+                ClearAllLogsCommand::class,
+            ]);
+        }
         // Publish migrations
         $this->publishes([
             __DIR__.'/../database/migrations' => database_path('migrations'),
