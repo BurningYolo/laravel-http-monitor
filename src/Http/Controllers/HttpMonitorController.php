@@ -10,6 +10,32 @@ use Illuminate\Routing\Controller;
 
 class HttpMonitorController extends Controller
 {
+    public function index()
+    {
+        $totalInbound = InboundRequest::count();
+        $totalOutbound = OutboundRequest::count();
+        $totalRequests = $totalInbound + $totalOutbound;
+
+        $uniqueIps = TrackedIp::count();
+
+        $successfulOutbound = OutboundRequest::where('successful', true)->count();
+        $failedOutbound = OutboundRequest::where('successful', false)->count();
+
+        $recentInbound = InboundRequest::latest()->limit(5)->get();
+        $recentOutbound = OutboundRequest::latest()->limit(5)->get();
+
+        return view('http-monitor::index', compact(
+            'totalRequests',
+            'totalInbound',
+            'totalOutbound',
+            'uniqueIps',
+            'successfulOutbound',
+            'failedOutbound',
+            'recentInbound',
+            'recentOutbound'
+        ));
+    }
+
     // Inbound Requests
     public function inboundIndex(Request $request)
     {

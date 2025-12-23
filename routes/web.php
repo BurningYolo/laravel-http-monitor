@@ -4,6 +4,10 @@ use Burningyolo\LaravelHttpMonitor\Http\Controllers\HttpMonitorController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('http-monitor')->name('http-monitor.')->middleware(['web'])->group(function () {
+
+    // Dashboard
+    Route::get('/', [HttpMonitorController::class, 'index'])->name('index');
+
     // Inbound
     Route::get('inbound', [HttpMonitorController::class, 'inboundIndex'])->name('inbound.index');
     Route::get('inbound/{id}', [HttpMonitorController::class, 'inboundShow'])->name('inbound.show');
