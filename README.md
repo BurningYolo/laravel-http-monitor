@@ -2,11 +2,6 @@
 
 A Laravel package for tracking and monitoring both inbound and outbound HTTP requests with IP tracking & optional geographical data.
 
-## Requirements
-
-- PHP 8.0 or higher
-- Laravel 9.x, 10.x, or 11.x
-
 ## Installation
 
 Install the package via Composer:
