@@ -33,6 +33,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Routes Enabled
+    |--------------------------------------------------------------------------
+    |
+    | These Routes will be registered to view the dashboard and Views, if you don't want front-end then you can disable these routes
+    |
+    */
+    'routes_enabled' => env('REQUEST_TRACKER_ROUTES_ENABLED', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Excluded Paths
     |--------------------------------------------------------------------------
     |

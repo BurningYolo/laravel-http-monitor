@@ -2,10 +2,10 @@
 
 namespace Burningyolo\LaravelHttpMonitor\Tests\Unit;
 
-use Burningyolo\LaravelHttpMonitor\Commands\ShowStatsCommand;
 use Burningyolo\LaravelHttpMonitor\Commands\CleanupRequestLogsCommand;
 use Burningyolo\LaravelHttpMonitor\Commands\ClearAllLogsCommand;
 use Burningyolo\LaravelHttpMonitor\Commands\PruneRequestLogsCommand;
+use Burningyolo\LaravelHttpMonitor\Commands\ShowStatsCommand;
 use Burningyolo\LaravelHttpMonitor\Models\InboundRequest;
 use Burningyolo\LaravelHttpMonitor\Models\OutboundRequest;
 use Burningyolo\LaravelHttpMonitor\Models\TrackedIp;
@@ -31,15 +31,15 @@ abstract class CommandTestCase extends TestCase
         // Setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix'   => '',
+            'prefix' => '',
         ]);
     }
 
     protected function defineDatabaseMigrations()
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
     }
 }
 
@@ -87,7 +87,7 @@ class CommandTest extends CommandTestCase
             'method' => 'GET',
             'url' => '/api/test',
             'full_url' => 'http://example.com/api/old',
-            'path' => 'abc', 
+            'path' => 'abc',
             'status_code' => 200,
             'duration_ms' => 150.5,
             'created_at' => now(),
@@ -96,9 +96,9 @@ class CommandTest extends CommandTestCase
         OutboundRequest::create([
             'url' => 'https://api.example.com',
             'full_url' => 'http://example.com/api/old',
-            'path' => 'abc', 
+            'path' => 'abc',
             'method' => 'POST',
-            'host' => 'yourmum.com', 
+            'host' => 'yourmum.com',
             'status_code' => 201,
             'duration_ms' => 250.3,
             'created_at' => now(),
@@ -126,7 +126,7 @@ class CommandTest extends CommandTestCase
                 'method' => 'GET',
                 'url' => "/api/test{$i}",
                 'full_url' => 'http://example.com/api/old',
-                'path' => 'abc', 
+                'path' => 'abc',
                 'status_code' => 200,
                 'created_at' => now(),
             ]);
@@ -156,7 +156,7 @@ class CleanupRequestLogsCommandTest extends CommandTestCase
             'method' => 'GET',
             'url' => '/api/old',
             'full_url' => 'http://example.com/api/old',
-            'path' => 'abc', 
+            'path' => 'abc',
             'status_code' => 200,
             'created_at' => now()->subDays(40),
         ]);
@@ -166,7 +166,7 @@ class CleanupRequestLogsCommandTest extends CommandTestCase
             'method' => 'GET',
             'url' => '/api/recent',
             'full_url' => 'http://example.com/api/old',
-            'path' => 'abc', 
+            'path' => 'abc',
             'status_code' => 200,
             'created_at' => now()->subDays(10),
         ]);
@@ -192,7 +192,7 @@ class CleanupRequestLogsCommandTest extends CommandTestCase
             'method' => 'GET',
             'url' => '/api/test',
             'full_url' => 'http://example.com/api/old',
-            'path' => 'abc', 
+            'path' => 'abc',
             'status_code' => 200,
             'created_at' => now()->subDays(40),
         ]);
@@ -219,7 +219,7 @@ class CleanupRequestLogsCommandTest extends CommandTestCase
             'method' => 'GET',
             'url' => '/api/error',
             'full_url' => 'http://example.com/api/old',
-            'path' => 'abc', 
+            'path' => 'abc',
             'status_code' => 500,
             'created_at' => now()->subDays(40),
         ]);
@@ -229,7 +229,7 @@ class CleanupRequestLogsCommandTest extends CommandTestCase
             'method' => 'GET',
             'url' => '/api/success',
             'full_url' => 'http://example.com/api/old',
-            'path' => 'abc', 
+            'path' => 'abc',
             'status_code' => 200,
             'created_at' => now()->subDays(40),
         ]);
@@ -237,7 +237,7 @@ class CleanupRequestLogsCommandTest extends CommandTestCase
         $this->artisan(CleanupRequestLogsCommand::class, [
             '--days' => 30,
             '--status' => 500,
-            '--type' => 'inbound'
+            '--type' => 'inbound',
         ])->assertSuccessful();
 
         $this->assertEquals(1, InboundRequest::count());
@@ -264,14 +264,14 @@ class CleanupRequestLogsCommandTest extends CommandTestCase
             'method' => 'GET',
             'url' => '/api/test',
             'full_url' => 'http://example.com/api/old',
-            'path' => 'abc', 
+            'path' => 'abc',
             'status_code' => 200,
             'created_at' => now(),
         ]);
 
         $this->artisan(CleanupRequestLogsCommand::class, [
             '--days' => 30,
-            '--orphaned-ips' => true
+            '--orphaned-ips' => true,
         ])->assertSuccessful();
 
         $this->assertEquals(1, TrackedIp::count());
@@ -292,7 +292,7 @@ class CleanupRequestLogsCommandTest extends CommandTestCase
             'method' => 'GET',
             'url' => '/api/test',
             'full_url' => 'http://example.com/api/old',
-            'path' => 'abc', 
+            'path' => 'abc',
             'status_code' => 200,
             'created_at' => now()->subDays(40),
         ]);
@@ -300,7 +300,7 @@ class CleanupRequestLogsCommandTest extends CommandTestCase
         OutboundRequest::create([
             'url' => 'https://api.example.com',
             'full_url' => 'http://example.com/api/old',
-            'path' => 'abc', 
+            'path' => 'abc',
             'method' => 'POST',
             'status_code' => 200,
             'created_at' => now()->subDays(40),
@@ -331,7 +331,7 @@ class ClearAllLogsCommandTest extends CommandTestCase
             'method' => 'GET',
             'url' => '/api/test',
             'full_url' => 'http://example.com/api/old',
-            'path' => 'abc', 
+            'path' => 'abc',
             'status_code' => 200,
             'created_at' => now(),
         ]);
@@ -339,7 +339,7 @@ class ClearAllLogsCommandTest extends CommandTestCase
         OutboundRequest::create([
             'url' => 'https://api.example.com',
             'full_url' => 'http://example.com/api/old',
-            'path' => 'abc', 
+            'path' => 'abc',
             'method' => 'POST',
             'status_code' => 200,
             'created_at' => now(),
@@ -368,7 +368,7 @@ class ClearAllLogsCommandTest extends CommandTestCase
             'method' => 'GET',
             'url' => '/api/test',
             'full_url' => 'http://example.com/api/old',
-            'path' => 'abc', 
+            'path' => 'abc',
             'status_code' => 200,
             'created_at' => now(),
         ]);
@@ -376,7 +376,7 @@ class ClearAllLogsCommandTest extends CommandTestCase
         OutboundRequest::create([
             'url' => 'https://api.example.com',
             'full_url' => 'http://example.com/api/old',
-            'path' => 'abc', 
+            'path' => 'abc',
             'method' => 'POST',
             'status_code' => 200,
             'created_at' => now(),
@@ -413,7 +413,7 @@ class ClearAllLogsCommandTest extends CommandTestCase
             'method' => 'GET',
             'url' => '/api/test',
             'full_url' => 'http://example.com/api/old',
-            'path' => 'abc', 
+            'path' => 'abc',
             'status_code' => 200,
             'created_at' => now(),
         ]);
@@ -456,7 +456,7 @@ class PruneRequestLogsCommandTest extends CommandTestCase
             'method' => 'GET',
             'url' => '/api/old',
             'full_url' => 'http://example.com/api/old',
-            'path' => 'abc', 
+            'path' => 'abc',
             'status_code' => 200,
             'created_at' => now()->subDays(40),
         ]);
@@ -466,7 +466,7 @@ class PruneRequestLogsCommandTest extends CommandTestCase
             'method' => 'GET',
             'url' => '/api/recent',
             'full_url' => 'http://example.com/api/old',
-            'path' => 'abc', 
+            'path' => 'abc',
             'status_code' => 200,
             'created_at' => now()->subDays(20),
         ]);
@@ -517,7 +517,7 @@ class PruneRequestLogsCommandTest extends CommandTestCase
             'method' => 'GET',
             'url' => '/api/test',
             'full_url' => 'http://example.com/api/old',
-            'path' => 'abc', 
+            'path' => 'abc',
             'status_code' => 200,
             'created_at' => now()->subDays(40),
         ]);
@@ -525,7 +525,7 @@ class PruneRequestLogsCommandTest extends CommandTestCase
         OutboundRequest::create([
             'url' => 'https://api.example.com',
             'full_url' => 'http://example.com/api/old',
-            'path' => 'abc', 
+            'path' => 'abc',
             'method' => 'POST',
             'status_code' => 200,
             'created_at' => now()->subDays(50),
