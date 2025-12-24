@@ -254,24 +254,26 @@ return [
         'outbound_days' => env('REQUEST_TRACKER_RETENTION_OUTBOUND', 7),
     ],
 
-        /*
+    /*
     |--------------------------------------------------------------------------
     | Send Stats Notifications to Discord & Slack
     |--------------------------------------------------------------------------
     |
     | Send Notificaitons about website stats to Discord & Slack
-    | 
+    |
     |
     */
 
-    'discord' =>[
+    'discord' => [
         'webhook_url' => env('REQUEST_TRACKER_DISCORD_WEBHOOK_URL', null),
+        'enabled' => env('REQUEST_TRACKER_DISCORD_NOTIFICATIONS_ENABLED', false),
 
     ],
 
     'slack' => [
         'webhook_url' => env('REQUEST_TRACKER_SLACK_WEBHOOK_URL', null),
-    ], 
+        'enabled' => env('REQUEST_TRACKER_SLACK_NOTIFICATIONS_ENABLED', false),
+    ],
 
     'notifications' => [
         'enabled_fields' => [
@@ -281,10 +283,10 @@ return [
             'failed_outbound' => true,
             'avg_response_time' => true,
             'unique_ips' => true,
-            'last_24h_activity' => false, 
+            'last_24h_activity' => false,
             'ratio_success_failure' => false,
             'top_endpoints' => false,
-            'top_ips' => false, // will probably see what I can add or not 
+            'top_ips' => false, // will probably see what I can add or not
         ],
     ],
 

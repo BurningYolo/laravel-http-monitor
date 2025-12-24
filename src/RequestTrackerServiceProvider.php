@@ -5,8 +5,8 @@ namespace Burningyolo\LaravelHttpMonitor;
 use Burningyolo\LaravelHttpMonitor\Commands\CleanupRequestLogsCommand;
 use Burningyolo\LaravelHttpMonitor\Commands\ClearAllLogsCommand;
 use Burningyolo\LaravelHttpMonitor\Commands\PruneRequestLogsCommand;
-use Burningyolo\LaravelHttpMonitor\Commands\ShowStatsCommand;
 use Burningyolo\LaravelHttpMonitor\Commands\SendStatsToWebhooksCommand;
+use Burningyolo\LaravelHttpMonitor\Commands\ShowStatsCommand;
 use Burningyolo\LaravelHttpMonitor\Http\OutboundRequestMiddleware;
 use Burningyolo\LaravelHttpMonitor\Middleware\TrackInboundRequest;
 use Illuminate\Routing\Router;
@@ -26,7 +26,7 @@ class RequestTrackerServiceProvider extends ServiceProvider
                 PruneRequestLogsCommand::class,
                 ShowStatsCommand::class,
                 ClearAllLogsCommand::class,
-                SendStatsToWebhooksCommand::class,  
+                SendStatsToWebhooksCommand::class,
 
             ]);
 
