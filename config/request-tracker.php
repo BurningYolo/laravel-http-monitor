@@ -273,4 +273,19 @@ return [
         'webhook_url' => env('REQUEST_TRACKER_SLACK_WEBHOOK_URL', null),
     ], 
 
+    'notifications' => [
+        'enabled_fields' => [
+            'total_inbound' => true,
+            'total_outbound' => true,
+            'successful_outbound' => true,
+            'failed_outbound' => true,
+            'avg_response_time' => true,
+            'unique_ips' => true,
+            'last_24h_activity' => false, 
+            'ratio_success_failure' => false,
+            'top_endpoints' => false,
+            'top_ips' => false, // will probably see what I can add or not 
+        ],
+    ],
+
 ];
