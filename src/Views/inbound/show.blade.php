@@ -65,17 +65,17 @@
 
         @if($request->headers)
         <h6 class="mt-4">Request Headers</h6>
-        <pre class="bg-light p-3 rounded"><code>{{ json_encode($request->headers, JSON_PRETTY_PRINT) }}</code></pre>
+        <pre class="bg-dark p-3 rounded"><code>{{ json_encode($request->headers, JSON_PRETTY_PRINT) }}</code></pre>
         @endif
 
         @if($request->request_body)
         <h6 class="mt-4">Request Body</h6>
-        <pre class="bg-light p-3 rounded"><code>{{ is_string($request->request_body) ? $request->request_body : json_encode($request->request_body, JSON_PRETTY_PRINT) }}</code></pre>
+        <pre class="bg-dark p-3 rounded"><code>{{ is_string($request->request_body) ? $request->request_body : json_encode($request->request_body, JSON_PRETTY_PRINT) }}</code></pre>
         @endif
 
         @if($request->response_body)
         <h6 class="mt-4">Response Body</h6>
-        <pre class="bg-light p-3 rounded"><code>{{ is_string($request->response_body) ? $request->response_body : json_encode($request->response_body, JSON_PRETTY_PRINT) }}</code></pre>
+        <pre class="bg-dark p-3 rounded"><code>{{ is_string($request->response_body) ? $request->response_body : json_encode($request->response_body, JSON_PRETTY_PRINT) }}</code></pre>
         @endif
     </div>
 </div>

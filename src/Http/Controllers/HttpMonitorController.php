@@ -7,20 +7,49 @@ use Burningyolo\LaravelHttpMonitor\Models\OutboundRequest;
 use Burningyolo\LaravelHttpMonitor\Models\TrackedIp;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 
 class HttpMonitorController extends Controller
 {
     public function index()
     {
+        // Basic counts
         $totalInbound = InboundRequest::count();
         $totalOutbound = OutboundRequest::count();
         $totalRequests = $totalInbound + $totalOutbound;
-
         $uniqueIps = TrackedIp::count();
 
+        // Outbound success metrics
         $successfulOutbound = OutboundRequest::where('successful', true)->count();
         $failedOutbound = OutboundRequest::where('successful', false)->count();
 
+        // Response time statistics
+        $avgResponseTime = OutboundRequest::avg('duration_ms');
+        $fastestRequest = OutboundRequest::min('duration_ms');
+        $slowestRequest = OutboundRequest::max('duration_ms');
+
+        // Time-based activity
+        $requestsLast24h = InboundRequest::where('created_at', '>=', now()->subDay())->count()
+                         + OutboundRequest::where('created_at', '>=', now()->subDay())->count();
+
+        $requestsLastHour = InboundRequest::where('created_at', '>=', now()->subHour())->count()
+                          + OutboundRequest::where('created_at', '>=', now()->subHour())->count();
+
+        // Method distribution for inbound
+        $inboundMethods = InboundRequest::select('method', DB::raw('count(*) as count'))
+            ->groupBy('method')
+            ->orderBy('count', 'desc')
+            ->get();
+
+        // Status code distribution for inbound
+        $statusCodes = InboundRequest::select('status_code', DB::raw('count(*) as count'))
+            ->whereNotNull('status_code')
+            ->groupBy('status_code')
+            ->orderBy('count', 'desc')
+            ->limit(5)
+            ->get();
+
+        // Recent requests
         $recentInbound = InboundRequest::latest()->limit(5)->get();
         $recentOutbound = OutboundRequest::latest()->limit(5)->get();
 
@@ -31,6 +60,13 @@ class HttpMonitorController extends Controller
             'uniqueIps',
             'successfulOutbound',
             'failedOutbound',
+            'avgResponseTime',
+            'fastestRequest',
+            'slowestRequest',
+            'requestsLast24h',
+            'requestsLastHour',
+            'inboundMethods',
+            'statusCodes',
             'recentInbound',
             'recentOutbound'
         ));
