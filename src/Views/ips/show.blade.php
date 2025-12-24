@@ -14,7 +14,7 @@
                     <th style="width: 200px;">Location</th>
                     <td>
                         @if($ip->hasGeoData())
-                            <span class="badge bg-light text-dark">
+                            <span class="badge bg-dark text-dark">
                                 🌍 {{ implode(', ', array_filter([$ip->city, $ip->region_name, $ip->country_name])) }}
                             </span>
                             @if($ip->latitude && $ip->longitude)

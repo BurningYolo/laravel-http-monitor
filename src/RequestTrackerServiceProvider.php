@@ -26,35 +26,40 @@ class RequestTrackerServiceProvider extends ServiceProvider
                 ShowStatsCommand::class,
                 ClearAllLogsCommand::class,
             ]);
-        }
-        // Publish migrations
-        $this->publishes([
-            __DIR__.'/../database/migrations' => database_path('migrations'),
-        ], 'request-tracker-migrations');
 
-        // Publish config
-        $this->publishes([
-            __DIR__.'/../config/request-tracker.php' => config_path('request-tracker.php'),
-        ], 'request-tracker-config');
+            // Publish migrations
+            $this->publishes([
+                __DIR__.'/../database/migrations' => database_path('migrations'),
+            ], 'request-tracker-migrations');
+
+            // Publish config
+            $this->publishes([
+                __DIR__.'/../config/request-tracker.php' => config_path('request-tracker.php'),
+            ], 'request-tracker-config');
+
+            // Publish views
+            $this->publishes([
+                __DIR__.'/Views' => resource_path('views/vendor/http-monitor'),
+            ], 'http-monitor-views');
+        }
 
         // Auto-load migrations
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
         // Register inbound middleware
-        $router = $this->app->make(Router::class);
-        $router->pushMiddlewareToGroup('web', TrackInboundRequest::class);
-        $router->pushMiddlewareToGroup('api', TrackInboundRequest::class);
+        if (Config::get('request-tracker.track_inbound', true)) {
+            $router = $this->app->make(Router::class);
+            $router->pushMiddlewareToGroup('web', TrackInboundRequest::class);
+            $router->pushMiddlewareToGroup('api', TrackInboundRequest::class);
+        }
 
         // Load views
         $this->loadViewsFrom(__DIR__.'/Views', 'http-monitor');
 
-        // Publish views
-        $this->publishes([
-            __DIR__.'/Views' => resource_path('views/vendor/http-monitor'),
-        ], 'http-monitor-views');
-
         // Load routes
-        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        if (Config::get('request-tracker.routes_enabled', true)) {
+            $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        }
     }
 
     public function register()
@@ -74,7 +79,6 @@ class RequestTrackerServiceProvider extends ServiceProvider
 
     protected function registerOutboundTracking(): void
     {
-
         Http::globalMiddleware(
             OutboundRequestMiddleware::handle()
         );
