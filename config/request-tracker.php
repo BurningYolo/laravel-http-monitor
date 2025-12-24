@@ -254,4 +254,23 @@ return [
         'outbound_days' => env('REQUEST_TRACKER_RETENTION_OUTBOUND', 7),
     ],
 
+        /*
+    |--------------------------------------------------------------------------
+    | Send Stats Notifications to Discord & Slack
+    |--------------------------------------------------------------------------
+    |
+    | Send Notificaitons about website stats to Discord & Slack
+    | 
+    |
+    */
+
+    'discord' =>[
+        'webhook_url' => env('REQUEST_TRACKER_DISCORD_WEBHOOK_URL', null),
+
+    ],
+
+    'slack' => [
+        'webhook_url' => env('REQUEST_TRACKER_SLACK_WEBHOOK_URL', null),
+    ], 
+
 ];
