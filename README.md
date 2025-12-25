@@ -1,6 +1,6 @@
 # Laravel HTTP Monitor
 
-A Laravel package for tracking and monitoring both inbound and outbound HTTP requests with IP tracking & optional geographical data.
+**Track & monitor inbound + outbound HTTP requests** in Laravel with IP tracking, optional geo-location, detailed analytics dashboard, website updates sent to **Discord** & **Slack** via webhooks.
 
 ## Installation
 
@@ -22,7 +22,7 @@ Publish migrations:
 php artisan vendor:publish --tag=request-tracker-migrations
 ```
 
-Optionally, publish the views for customization:
+Optionally, publish the views if you want front-end:
 
 ```bash
 php artisan vendor:publish --tag=http-monitor-views
@@ -75,6 +75,41 @@ The configuration file `config/request-tracker.php` provides extensive options f
     ],
 ```
 
+### Discord & Slack Webhook Settings
+
+```php
+    // Discord Specific Webhook related fields
+    'discord' => [
+        'webhook_url' => env('REQUEST_TRACKER_DISCORD_WEBHOOK_URL', null),
+        'enabled' => env('REQUEST_TRACKER_DISCORD_NOTIFICATIONS_ENABLED', false),
+        'bot_name' => env('REQUEST_TRACKER_DISCORD_BOT_NAME', 'Laravel HTTP Monitor'),
+        'avatar_url' => env('REQUEST_TRACKER_DISCORD_AVATAR_URL', 'https://avatars.githubusercontent.com/u/81748439'),
+
+    ],
+    // Slack Specific Webhook Related fields
+    'slack' => [
+        'webhook_url' => env('REQUEST_TRACKER_SLACK_WEBHOOK_URL', null),
+        'enabled' => env('REQUEST_TRACKER_SLACK_NOTIFICATIONS_ENABLED', false),
+    ],
+
+    // the type of data & fields you wanna send via webhook
+    'notifications' => [
+        'enabled_fields' => [
+            'total_inbound' => true,
+            'total_outbound' => true,
+            'successful_outbound' => true,
+            'failed_outbound' => true,
+            'avg_response_time' => true,
+            'unique_ips' => true,
+            'last_24h_activity' => true,
+            'ratio_success_failure' => true,
+            'top_endpoints' => true,
+            'top_ips' => true,
+        ],
+    ],
+
+```
+
 ### Automatic Tracking
 
 Once installed, the package automatically tracks:
@@ -90,13 +125,7 @@ Access the built-in dashboard by visiting:
 /http-monitor
 ```
 
-The dashboard provides:
-
-- Overview of recent requests
-- Filtering by type, status, date range
-- Detailed request/response inspection
-- Geographic distribution of requests
-- Performance metrics
+![Dashboard Overview - Laravel HTTP Monitor](screenshots/dashboard.png "Dashboard showing inbound/outbound requests overview")
 
 ## Artisan Commands
 
@@ -158,6 +187,36 @@ php artisan request-tracker:clear --type=ips
 
 # Skip confirmation
 php artisan request-tracker:clear --force
+
+```
+
+### Send Stats to Discord & Slack
+
+Based on Config the Data will be sent of last 24 hours.
+
+```bash
+# Send Notification
+php artisan request-tracker:send-stats
+
+```
+
+![Example Discord Stats](screenshots/discord.png "Discord Stats Overview")
+
+![Example Slack Stats](screenshots/slack.png "Slack Stats Overview")
+
+**Important note**
+
+All listed Artisan commands are **manual only**. They do **not** run automatically.
+
+If you want to run any of them on a schedule (e.g. daily stats, cleanup, etc.), add them to your Laravel scheduler.
+
+```php
+
+use Illuminate\Support\Facades\Schedule;
+
+Schedule::command('request-tracker:send-stats')
+        ->dailyAt('08:00');
+
 ```
 
 ### Accessing Tracked Data
