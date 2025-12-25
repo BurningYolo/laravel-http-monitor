@@ -23,18 +23,28 @@ class StatsNotifier
     /**
      * Gather stats and send notifications
      */
-    public function sendStats(): void
+    public function sendStats(): array
     {
         $stats = $this->gatherStats();
+        $sentChannels = [];
 
-        // Send to active channels
-        if (Config::get('request-tracker.slack.enabled', false)) {
+        if (
+            Config::get('request-tracker.slack.enabled', false) &&
+            filled(Config::get('request-tracker.slack.webhook_url'))
+        ) {
             $this->slack->send($stats);
+            $sentChannels[] = 'slack';
         }
 
-        if (Config::get('request-tracker.discord.enabled', false)) {
+        if (
+            Config::get('request-tracker.discord.enabled', false) &&
+            filled(Config::get('request-tracker.discord.webhook_url'))
+        ) {
             $this->discord->send($stats);
+            $sentChannels[] = 'discord';
         }
+
+        return $sentChannels;
     }
 
     /**

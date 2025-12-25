@@ -13,7 +13,16 @@ class SendStatsToWebhooksCommand extends Command
 
     public function handle(StatsNotifier $notifier)
     {
-        $notifier->sendStats();
-        $this->info('Stats sent successfully.');
+        $sentChannels = $notifier->sendStats();
+
+        if (empty($sentChannels)) {
+            $this->warn('No notifications were sent. Please enable Slack or Discord and set webhook URLs.');
+
+            return;
+        }
+
+        $this->info(
+            'Stats sent via: '.implode(', ', array_map('ucfirst', $sentChannels))
+        );
     }
 }

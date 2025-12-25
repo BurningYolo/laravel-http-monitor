@@ -260,6 +260,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Send Notificaitons about website stats to Discord & Slack
+    | Change the Avatar URL and Bot Name as per your preference
     |
     |
     */
@@ -267,6 +268,8 @@ return [
     'discord' => [
         'webhook_url' => env('REQUEST_TRACKER_DISCORD_WEBHOOK_URL', null),
         'enabled' => env('REQUEST_TRACKER_DISCORD_NOTIFICATIONS_ENABLED', false),
+        'bot_name' => env('REQUEST_TRACKER_DISCORD_BOT_NAME', 'Laravel HTTP Monitor'),
+        'avatar_url' => env('REQUEST_TRACKER_DISCORD_AVATAR_URL', 'https://avatars.githubusercontent.com/u/81748439'),
 
     ],
 
@@ -275,6 +278,15 @@ return [
         'enabled' => env('REQUEST_TRACKER_SLACK_NOTIFICATIONS_ENABLED', false),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Notifications Enabled Fields
+    |--------------------------------------------------------------------------
+    |
+    | Congigure this to enable/disable fields to be included in the notifications going to discord & Slack
+    |
+    |
+    */
     'notifications' => [
         'enabled_fields' => [
             'total_inbound' => true,
@@ -283,10 +295,10 @@ return [
             'failed_outbound' => true,
             'avg_response_time' => true,
             'unique_ips' => true,
-            'last_24h_activity' => false,
-            'ratio_success_failure' => false,
-            'top_endpoints' => false,
-            'top_ips' => false, // will probably see what I can add or not
+            'last_24h_activity' => true,
+            'ratio_success_failure' => true,
+            'top_endpoints' => true,
+            'top_ips' => true,
         ],
     ],
 

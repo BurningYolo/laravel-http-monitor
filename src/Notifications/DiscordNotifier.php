@@ -33,6 +33,8 @@ class DiscordNotifier
             $response = Http::timeout(10)
                 ->withHeaders(['Content-Type' => 'application/json'])
                 ->post($this->webhookUrl, [
+                    'username' => Config::get('request-tracker.discord.bot_name', 'HTTP Monitor Bot'),
+                    'avatar_url' => Config::get('request-tracker.discord.avatar_url', null),
                     'embeds' => [$embed],
                 ]);
             /** @var \Illuminate\Http\Client\Response $response */
@@ -179,6 +181,11 @@ class DiscordNotifier
             'timestamp' => now()->toIso8601String(),
             'footer' => [
                 'text' => 'Laravel HTTP Monitor',
+            ],
+            'author' => [
+                'name' => 'Created by BurningYolo',
+                'url' => 'https://github.com/BurningYolo/laravel-http-monitor',
+                'icon_url' => 'https://avatars.githubusercontent.com/u/81748439',
             ],
         ];
     }

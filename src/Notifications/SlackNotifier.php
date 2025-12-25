@@ -209,7 +209,7 @@ class SlackNotifier
             'elements' => [
                 [
                     'type' => 'mrkdwn',
-                    'text' => ' '.now()->format('Y-m-d H:i:s').' | Laravel HTTP Monitor',
+                    'text' => ' '.now()->format('Y-m-d H:i:s').'  <https://github.com/BurningYolo/laravel-http-monitor| Laravel HTTP Monitor> | Created by <https://github.com/BurningYolo| BurningYolo>',
                 ],
             ],
         ];
