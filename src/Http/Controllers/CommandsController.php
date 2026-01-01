@@ -20,8 +20,8 @@ class CommandsController extends Controller
             'days' => 'nullable|integer|min:1|max:365',
             'type' => 'nullable|string|in:all,inbound,outbound,ips',
             'status' => 'nullable|integer',
-            'dry_run' => 'nullable|boolean',
-            'orphaned_ips' => 'nullable|boolean',
+            'dry_run' => 'nullable|in:on,1,true', 
+            'orphaned_ips' => 'nullable|in:on,1,true',
             'force' => 'nullable|boolean',
         ]);
 
