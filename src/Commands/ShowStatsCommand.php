@@ -49,8 +49,11 @@ class ShowStatsCommand extends Command
         $totalOutbound = OutboundRequest::count();
         $totalIps = TrackedIp::count();
         $ipsWithGeo = TrackedIp::whereNotNull('country_code')->count();
-
+        
+        /** @var InboundRequest|null $oldestInbound */
         $oldestInbound = InboundRequest::oldest()->first();
+
+        /** @var OutboundRequest|null $oldestOutbound */
         $oldestOutbound = OutboundRequest::oldest()->first();
 
         $this->table(
@@ -134,7 +137,7 @@ class ShowStatsCommand extends Command
 
         $inboundStats = InboundRequest::where('created_at', '>=', $cutoffDate)
             ->whereNotNull('status_code')
-            ->select('status_code', DB::raw('COUNT(*) as count'))
+            ->select(['status_code', DB::raw('COUNT(*) as count')])
             ->groupBy('status_code')
             ->orderBy('status_code')
             ->get();
