@@ -1,5 +1,6 @@
 <?php
 
+use Burningyolo\LaravelHttpMonitor\Http\Controllers\CommandsController;
 use Burningyolo\LaravelHttpMonitor\Http\Controllers\HttpMonitorController;
 use Illuminate\Support\Facades\Route;
 
@@ -7,6 +8,10 @@ Route::prefix('http-monitor')->name('http-monitor.')->middleware(['web'])->group
 
     // Dashboard
     Route::get('/', [HttpMonitorController::class, 'index'])->name('index');
+
+    // Commands
+    Route::get('/commands', [CommandsController::class, 'index'])->name('commands.index');
+    Route::post('/commands/execute', [CommandsController::class, 'execute'])->name('commands.execute');
 
     // Inbound
     Route::get('inbound', [HttpMonitorController::class, 'inboundIndex'])->name('inbound.index');
@@ -22,4 +27,5 @@ Route::prefix('http-monitor')->name('http-monitor.')->middleware(['web'])->group
     Route::get('ips', [HttpMonitorController::class, 'ipsIndex'])->name('ips.index');
     Route::get('ips/{id}', [HttpMonitorController::class, 'ipsShow'])->name('ips.show');
     Route::delete('ips/{id}', [HttpMonitorController::class, 'ipsDestroy'])->name('ips.destroy');
+
 });

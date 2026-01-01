@@ -20,31 +20,30 @@ class RequestTrackerServiceProvider extends ServiceProvider
     {
 
         // Register commands
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                CleanupRequestLogsCommand::class,
-                PruneRequestLogsCommand::class,
-                ShowStatsCommand::class,
-                ClearAllLogsCommand::class,
-                SendStatsToWebhooksCommand::class,
 
-            ]);
+        $this->commands([
+            CleanupRequestLogsCommand::class,
+            PruneRequestLogsCommand::class,
+            ShowStatsCommand::class,
+            ClearAllLogsCommand::class,
+            SendStatsToWebhooksCommand::class,
 
-            // Publish migrations
-            $this->publishes([
-                __DIR__.'/../database/migrations' => database_path('migrations'),
-            ], 'request-tracker-migrations');
+        ]);
 
-            // Publish config
-            $this->publishes([
-                __DIR__.'/../config/request-tracker.php' => config_path('request-tracker.php'),
-            ], 'request-tracker-config');
+        // Publish migrations
+        $this->publishes([
+            __DIR__.'/../database/migrations' => database_path('migrations'),
+        ], 'request-tracker-migrations');
 
-            // Publish views
-            $this->publishes([
-                __DIR__.'/Views' => resource_path('views/vendor/http-monitor'),
-            ], 'http-monitor-views');
-        }
+        // Publish config
+        $this->publishes([
+            __DIR__.'/../config/request-tracker.php' => config_path('request-tracker.php'),
+        ], 'request-tracker-config');
+
+        // Publish views
+        $this->publishes([
+            __DIR__.'/Views' => resource_path('views/vendor/http-monitor'),
+        ], 'http-monitor-views');
 
         // Auto-load migrations
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');

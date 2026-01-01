@@ -327,6 +327,10 @@
                    href="{{ route('http-monitor.ips.index') }}">
                     IPs
                 </a>
+                 <a class="nav-link {{ request()->routeIs('http-monitor.commands.*') ? 'active' : '' }}"
+                    href="{{ route('http-monitor.commands.index') }}">
+                    Commands
+                </a>
             </div>
         </div>
     </nav>
