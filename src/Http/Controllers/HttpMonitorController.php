@@ -25,8 +25,8 @@ class HttpMonitorController extends Controller
 
         // Response time statistics
         $avgResponseTime = OutboundRequest::avg('duration_ms');
-        $fastestRequest = OutboundRequest::min('duration_ms');
-        $slowestRequest = OutboundRequest::max('duration_ms');
+        $fastestRequest = OutboundRequest::query()->min('duration_ms');
+        $slowestRequest = OutboundRequest::query()->max('duration_ms');
 
         // Time-based activity
         $requestsLast24h = InboundRequest::where('created_at', '>=', now()->subDay())->count()
@@ -36,13 +36,13 @@ class HttpMonitorController extends Controller
                           + OutboundRequest::where('created_at', '>=', now()->subHour())->count();
 
         // Method distribution for inbound
-        $inboundMethods = InboundRequest::select('method', DB::raw('count(*) as count'))
+        $inboundMethods = InboundRequest::query()->select(['method', DB::raw('count(*) as count')])
             ->groupBy('method')
             ->orderBy('count', 'desc')
             ->get();
 
         // Status code distribution for inbound
-        $statusCodes = InboundRequest::select('status_code', DB::raw('count(*) as count'))
+        $statusCodes = InboundRequest::query()->select(['status_code', DB::raw('count(*) as count')])
             ->whereNotNull('status_code')
             ->groupBy('status_code')
             ->orderBy('count', 'desc')
@@ -50,8 +50,8 @@ class HttpMonitorController extends Controller
             ->get();
 
         // Recent requests
-        $recentInbound = InboundRequest::latest()->limit(5)->get();
-        $recentOutbound = OutboundRequest::latest()->limit(5)->get();
+        $recentInbound = InboundRequest::query()->latest()->limit(5)->get();
+        $recentOutbound = OutboundRequest::query()->latest()->limit(5)->get();
 
         return view('http-monitor::index', compact(
             'totalRequests',
@@ -81,7 +81,7 @@ class HttpMonitorController extends Controller
             $query->where('method', $request->query('method'));
         }
         if ($request->filled('status')) {
-            $query->where('status_code', $request->status);
+            $query->where('status_code', $request->query('status'));
         }
 
         $requests = $query->paginate(20);
@@ -112,7 +112,7 @@ class HttpMonitorController extends Controller
             $query->where('method', $request->query('method'));
         }
         if ($request->filled('successful')) {
-            $query->where('successful', $request->successful === '1');
+            $query->where('successful', $request->query('successful') === '1');
         }
 
         $requests = $query->paginate(20);
@@ -137,10 +137,10 @@ class HttpMonitorController extends Controller
     // Tracked IPs
     public function ipsIndex(Request $request)
     {
-        $query = TrackedIp::latest('last_seen_at');
+        $query = TrackedIp::query()->latest('last_seen_at');
 
         if ($request->filled('has_geo')) {
-            if ($request->has_geo === '1') {
+            if ($request->query('has_geo') === '1') {
                 $query->whereNotNull('country_code');
             } else {
                 $query->whereNull('country_code');

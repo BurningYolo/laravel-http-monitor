@@ -49,7 +49,7 @@ class ShowStatsCommand extends Command
         $totalOutbound = OutboundRequest::count();
         $totalIps = TrackedIp::count();
         $ipsWithGeo = TrackedIp::whereNotNull('country_code')->count();
-        
+
         /** @var InboundRequest|null $oldestInbound */
         $oldestInbound = InboundRequest::oldest()->first();
 

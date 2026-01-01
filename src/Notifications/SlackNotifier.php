@@ -58,7 +58,7 @@ class SlackNotifier
             Log::error('Slack notification HTTP request failed', [
                 'exception' => $e->getMessage(),
                 'code' => $e->getCode(),
-                'response' => $e->response?->body(),
+                'response' => $e->response->body(),
             ]);
 
             return false;
