@@ -129,7 +129,7 @@ class StatsNotifier
      */
     protected function getTopEndpoints(int $limit = 5): array
     {
-        return InboundRequest::select('path', DB::raw('COUNT(*) as count'))
+        return InboundRequest::query()->select('path', DB::raw('COUNT(*) as count'))
             ->groupBy('path')
             ->orderByDesc('count')
             ->limit($limit)
@@ -146,7 +146,7 @@ class StatsNotifier
      */
     protected function getTopIps(int $limit = 5): array
     {
-        return TrackedIp::select('ip_address', DB::raw('COUNT(*) as count'))
+        return TrackedIp::query()->select('ip_address', DB::raw('COUNT(*) as count'))
             ->groupBy('ip_address')
             ->orderByDesc('count')
             ->limit($limit)

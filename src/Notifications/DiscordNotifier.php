@@ -57,7 +57,8 @@ class DiscordNotifier
             Log::error('Discord notification HTTP request failed', [
                 'exception' => $e->getMessage(),
                 'code' => $e->getCode(),
-                'response' => $e->response?->body(),
+                'response' => $e->response->body(),
+
             ]);
 
             return false;
